@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
-    Length
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, IntegerField, SelectField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional, NumberRange
 from app.models import User
 
 
@@ -55,3 +53,20 @@ class EmptyForm(FlaskForm):
 class PostForm(FlaskForm):
     post = TextAreaField('Say something', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class HotelSearchForm(FlaskForm):
+    location = StringField('Location', validators=[DataRequired()], render_kw=dict(class_='location-form', placeholder='Where to?'))
+    check_in = DateField('Check-in Date', format='%Y-%m-%d', validators=[DataRequired()])
+    check_out = DateField('Check-out Date', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Search')
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw=dict(class_='email-form', placeholder='email@placeholder.com'))
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')

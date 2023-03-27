@@ -7,3 +7,10 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     POSTS_PER_PAGE = 25
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL= True
+    MAIL_USERNAME = os.environ.get('GMAIL')
+    MAIL_PASSWORD = os.environ.get('PASSWORD')
+    ADMINS = ['cmpe165app@gmail.com']

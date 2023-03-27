@@ -1,0 +1,108 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} {% else %}Innkeeper{% endif %}
+{% endblock %}
+
+{% block body %}
+    <body>
+        <div class="gray-layer"></div>
+    {% block navbar %}
+        
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-header" href="{{ url_for('home') }}"><img class="logo" src="{{ url_for('static', filename='logo.svg') }}"  alt = "Logo"></a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li> <a href="#">Support</a></li>
+                        <li><a href="{{ url_for('test') }}">Tests</a></li>
+                        {% if current_user.is_anonymous %}
+                            <li><a href="{{ url_for('login') }}">Login</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endblock %}
+
+    {% block content %}
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {# application content needs to be provided in the app_content block #}
+            {% block app_content %}{% endblock %}
+        </div>
+        <style>
+            .navbar-default {
+            background-color: rgb(84, 84, 84, .7);
+            border: none;
+            }
+            .navbar-default .navbar-nav > li > a {
+            color: #fff;
+            font-size: 115%;
+            }
+            .navbar-default .navbar-header >img {
+            height: 70%;
+            padding-top: 2%;;
+            }
+            .navbar-default .navbar-nav > li > a:hover {
+            color: rgb(18, 225, 185);
+            }
+            
+            .col-md-4 {
+            margin: 0 auto;
+            float: none;
+            }
+            body {
+            margin:0;
+            padding:0;
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'nmachina', sans-serif;
+            }
+            .gray-layer {
+                position: absolute;
+                top: 0; bottom: 0; left: 0; right: 0;
+                background: rgba(222, 222, 222, 0.2);
+                z-index: -1;
+            }
+            @font-face {
+            font-family: 'nmachina';
+            src: url('static/fonts/PPNeueMachina-InktrapRegular.otf') format('otf');
+            font-weight: normal;
+            font-style: normal;
+            }
+            .logo {
+            width: 70%;
+            }
+        </style>
+    {% endblock content %}
+
+    {% block scripts %}
+        <script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
+        <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script>
+    {% endblock scripts %}
+    </body>
+{% endblock body %}
+
+

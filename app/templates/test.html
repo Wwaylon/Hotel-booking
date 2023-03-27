@@ -1,0 +1,57 @@
+{% extends 'interiorbase.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{%block page_title %} <b>Hotels for You</b> - San Francisco {% endblock %}
+
+
+{% block app_content %}
+    <div>
+        &#8205;
+        <a href="#">Filter</a>
+        &#8205;
+        &#8205;
+        <a href="#">Sort</a>
+    </div> 
+    <div class="hotel_grid">
+        <div class="hotel_listing">
+
+        </div>
+
+        <div class="hotel_listing">
+            <div stlye="display:grid;">1</div>
+            <div stlye="display:grid;">2</div>
+            <div stlye="display:grid;">1</div>
+        </div>
+
+        <div class="hotel_listing"></div>
+
+        <div class="hotel_listing"></div>
+        <div class="hotel_listing"></div>
+        <div class="hotel_listing"></div>
+    </div>
+
+    <style> 
+    .hotel_grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 10px;
+        grid-auto-rows: minmax(100px, auto);
+    }
+    .hotel_listing {
+        display: grid;
+        grid-template-columns: 35% 50% 15%;
+        grid-gap: 5px;
+        background-color: rgb(255, 255, 255);
+        height: 160px;
+    }
+    .listing_info{
+        display: grid;
+        background-color: brown;
+    }
+
+    </style>
+
+
+
+{% endblock %}
