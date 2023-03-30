@@ -2,6 +2,12 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  
+    </script>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">  
+    </script>  
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
+    rel="stylesheet" type="text/css" />  
 
     {% from "includes/_formhelpers.html" import render_field %}
     <div class="content_container">
@@ -11,7 +17,7 @@
 
                     <div class="item1"> 
                     <p style="display: inline; font-size: 20; margin-bottom: 0px; color: white;"> <b>Destination</b> </p> 
-                    {{form.location()}}
+                    {{form.location(id="tags")}}
                     </div>
 
                     <div class="item">
@@ -39,7 +45,25 @@
                 <div class="marketing_item3"> <i style=" padding-top: 5%; font-size: 1vw; color:rgb(255, 255, 250);">Plan your next trip with us!</i>  </div>
             </div>
         </div>
+        <script>
+            $( function() {
+              var availableTags = [
+                  {% for city in cities %}
+                      "{{city}}",
+                  {% endfor %}
+              ];
+              $( "#tags" ).autocomplete({
+                minLength: 3,
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availableTags, request.term);
+                    response(results.slice(0, 10));
+                }
+              });
+            } );
+        </script>
     </div>
+
+
     <style>
         .marketing_container {
             display: grid;

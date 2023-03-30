@@ -24,7 +24,6 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="{{ url_for('home') }}">Home</a></li>
                         <li> <a href="#">Support</a></li>
-                        <li><a href="{{ url_for('test') }}">Tests</a></li>
                         {% if current_user.is_anonymous %}
                             <li><a href="{{ url_for('login') }}">Login</a></li>
                         {% else %}
@@ -99,7 +98,6 @@
     {% endblock content %}
 
     {% block scripts %}
-        <script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
         <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script>
     {% endblock scripts %}
     </body>

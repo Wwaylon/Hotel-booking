@@ -4,8 +4,10 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.models import User, Post
+from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
+from sqlalchemy import func
+import csv
 
 
 @app.before_request
@@ -15,13 +17,47 @@ def before_request():
         db.session.commit()
 
 
+def load_csv_to_database():
+    with open('app/static/hotels.csv', 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            # Create a new Hotel object from the row data
+            hotel = Hotel(name=row['name'].strip(),
+                          address=row['address'].strip(),
+                          postal_code=int(row['postal_code']),
+                          city=row['city'].strip(),
+                          state=row['state'].strip(),
+                          country=row['country'].strip(),
+                          rating=float(row['rating']),
+                          hdescript=(row['hdescript']).strip(),
+                          img1=row['img1'].strip(),
+                          img2=row['img2'].strip(),
+                          img3=row['img3'].strip())
+            # Add the new hotel to the database
+            db.session.add(hotel)
+            # Commit the changes to the database
+            db.session.commit()
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    #load_csv_to_database()
     form = HotelSearchForm()
     if form.validate_on_submit():
-        flash('Search submitted')
-        return redirect(url_for('test'))
-    return render_template('home.html', title='Innkeeper - Home', form=form)
+        #check if checkout date is after checkin date
+        if form.check_out.data < form.check_in.data:
+            flash('Check-out date must be after check-in date')
+            return redirect(url_for('home'))
+        return redirect(url_for('sresults', city=str(form.location.data), check_in=str(form.check_in.data), check_out=str(form.check_out.data)))
+    
+    if request.method == "GET":
+        #read cities.csv into cities without quotes
+        with open('app/static/cities.csv', 'r') as f:
+            reader = csv.reader(f)
+            cities = list(reader)
+            #remove ' from each entry
+            cities = [x[0].replace("'", "") for x in cities]
+        return render_template('home.html', title='Innkeeper - Home', form=form, cities=cities)
 
 
 @app.route('/index', methods=['GET', 'POST'])
@@ -45,13 +81,13 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
 
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    form = HotelSearchForm()
-    if form.validate_on_submit():
-        flash('Search submitted')
-        return redirect(url_for('test'))
-    return render_template('test.html', form=form)
+@app.route('/sresults/<city>/<check_in>/<check_out>', methods=['GET', 'POST'])
+def sresults(city, check_in, check_out):
+    #if city contains a , then it is a city, state pair # remove the state and , from the city
+    if ',' in city:
+        city = city.split(',')[0]
+    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).all()
+    return render_template('sresults.html', city=city, hotels=results)
 
 
 @app.route('/explore')

@@ -1,0 +1,122 @@
+{% extends 'interiorbase.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{%block page_title %} <b>Hotels for You</b> - {{city}} {% endblock %}
+
+{% block app_content %}
+    <div>
+        &#8205;
+        <a href="#">Filter</a>
+        &#8205;
+        &#8205;
+        <a href="#">Sort</a>
+    </div> 
+    <div class="hotel_grid">
+        {% if hotels %}
+            {% for hotel in hotels %}
+                <div class="hotel_listing">
+                    <img src="{{ url_for('static', filename= hotel.img1) }}" alt="Img not loaded" class="hotel-image">
+                    <h5 class="hotel-name">{{ hotel.name }}</h5>
+                    <p class="room-size">Room Sizes: Double Queen, Double King, Single King</p>
+                    <p class="amentities">Amentities: Free Wifi, Pool, Hot Tub, Pet Friendly, Gym</p>
+                    <span class="hotel-price">From <b>$100</b> per night</span>
+                    <div class="hotel-rating">
+                        {% for i in range(1, 6) %}
+                            {% if hotel.rating >= i %}
+                                <i class="fa fa-star checked"></i>
+                            {% else %}
+                                <i class="fa fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <a href="#" class="book-btn">Book</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="hotel_listing"> 
+                <h2>No Results Found</h2>
+            </div>
+        {% endif %}
+    </div>
+
+    <style> 
+    .listing_info{
+        display: grid;
+        background-color: brown;
+    }
+    .checked {
+        color: orange;
+    }
+    .hotel_grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300rem, 1fr));
+        grid-gap: 2.5rem;
+        overflow:hidden
+    }
+    .hotel_listing{
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255);
+        max-width: 930px;
+        height: 165px;
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .hotel-image{
+        max-width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .hotel-name {
+        position: absolute;
+        top: 0;
+        left: 28%;
+        font-size: 20px;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    .hotel-price{
+        position: absolute;
+        top: 50%;
+        left : 85%;
+    }
+    .hotel-rating{
+        position: absolute;
+        top: 10%;
+        left : 85%;
+        font-size: 18px;
+
+    }
+    .book-btn{
+        position: absolute;
+        top: 30%;
+        left : 85%;
+        background-color: #12bbe11b;
+        color: #00C2FF;
+        border: 1px solid #00C2FF;
+        border-radius: 10px;
+        padding: 1px 35px;
+        font-size: 20px;
+    }
+    .room-size{
+        position: absolute;
+        top: 25%;
+        left : 28%;
+    }
+    .amentities{
+        position: absolute;
+        top: 50%;
+        left : 28%;
+    }
+
+    </style>
+
+
+
+{% endblock %}

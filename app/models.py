@@ -88,3 +88,47 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+    
+
+
+class Hotel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    address = db.Column(db.String)
+    postal_code = db.Column(db.Integer)
+    city = db.Column(db.String)
+    state = db.Column(db.String)
+    country = db.Column(db.String)
+    rooms = db.relationship('Room', backref='hotel', lazy='dynamic')
+    rating = db.Column(db.Float)
+    hdescript = db.Column(db.Integer)
+
+    img1 = db.Column(db.String)
+    img2 = db.Column(db.String)
+    img3 = db.Column(db.String)
+
+    def __repr__(self):
+        return '<Hotel {}>'.format(self.name)
+
+class Room(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pricepn = db.Column(db.Integer)
+
+    city = db.Column(db.String)
+    wifi = db.Column(db.Boolean)
+    pool = db.Column(db.Boolean)
+    htub = db.Column(db.Boolean)
+    petfr = db.Column(db.Boolean)
+    ac = db.Column(db.Boolean)
+    elevator = db.Column(db.Boolean)
+    signl = db.Column(db.Boolean)
+
+    hotel_id = db.Column(db.Integer, db.ForeignKey('hotel.id'))
+
+
+class Reservation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('room.id'))
+    check_in = db.Column(db.DateTime)
+    check_out = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
