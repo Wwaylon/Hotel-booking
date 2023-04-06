@@ -13,4 +13,6 @@ Steps to build and run
 8. "flask run"
 
 
+To get email reset working, add a .env file to your project with your email and password
+
 
