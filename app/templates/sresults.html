@@ -30,7 +30,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <a href="#" class="book-btn">Book</a>
+                    <a href="{{ url_for('hotel', hotel_id=hotel.id, check_in=check_in_date, check_out=check_out_date) }}" class="book-btn" value="{{hotel.id}}">Book</a>
                 </div>
             {% endfor %}
         {% else %}

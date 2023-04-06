@@ -92,7 +92,7 @@ class Post(db.Model):
 
 
 class Hotel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     name = db.Column(db.String)
     address = db.Column(db.String)
     postal_code = db.Column(db.Integer)
@@ -111,17 +111,15 @@ class Hotel(db.Model):
         return '<Hotel {}>'.format(self.name)
 
 class Room(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     pricepn = db.Column(db.Integer)
-
-    city = db.Column(db.String)
     wifi = db.Column(db.Boolean)
     pool = db.Column(db.Boolean)
     htub = db.Column(db.Boolean)
     petfr = db.Column(db.Boolean)
     ac = db.Column(db.Boolean)
     elevator = db.Column(db.Boolean)
-    signl = db.Column(db.Boolean)
+    room_type = db.Column(db.String)
 
     hotel_id = db.Column(db.Integer, db.ForeignKey('hotel.id'))
 
