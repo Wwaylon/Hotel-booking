@@ -1,49 +1,82 @@
-{% extends "base.html" %}
+{% extends 'interiorbase.html' %}
+
+{%block page_title %}<b>My Profile</b>  {% endblock %}
 
 {% block app_content %}
-    <table class="table table-hover">
-        <tr>
-            <td width="256px"><img src="{{ user.avatar(256) }}"></td>
-            <td>
-                <h1>User: {{ user.username }}</h1>
-                {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-                {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
-                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
-                {% if user == current_user %}
-                <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
-                {% elif not current_user.is_following(user) %}
-                <p>
-                    <form action="{{ url_for('follow', username=user.username) }}" method="post">
-                        {{ form.hidden_tag() }}
-                        {{ form.submit(value='Follow', class_='btn btn-default') }}
-                    </form>
-                </p>
-                {% else %}
-                <p>
-                    <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
-                        {{ form.hidden_tag() }}
-                        {{ form.submit(value='Unfollow', class_='btn btn-default') }}
-                    </form>
-                </p>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
-    <nav aria-label="...">
-        <ul class="pager">
-            <li class="previous{% if not prev_url %} disabled{% endif %}">
-                <a href="{{ prev_url or '#' }}">
-                    <span aria-hidden="true">&larr;</span> Newer posts
-                </a>
-            </li>
-            <li class="next{% if not next_url %} disabled{% endif %}">
-                <a href="{{ next_url or '#' }}">
-                    Older posts <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <div class="white-back">
+        <div class="user-info-container">
+                <img src="{{ url_for('static', filename= 'default-user.png') }}" class="profile-pic"> 
+                <div class ="info-section">
+                    <dl>
+                        <dt class="label">User Information</h1>
+                        <dd class="user-info"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Username:</b> </p>
+                        <dt class="label">Email Address</h1>
+                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email address:</b> </p>
+                        <dt class="label">Reward Points</h1>
+                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total Points:</b> </p>
+                        <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="btn-p">Change Password</a> </dt>
+                    </dl>
+                </div> 
+        </div>
+        <img src="{{ url_for('static', filename= 'seperator.svg') }}" class ="seperator">
+        <div class="reservations-grid" > 
+            <h1 class="label">Active Reservations</h1>
+
+            <h1 class="label">Past Reservations</h1>
+
+        </div>
+    </div>
+
+    <style> 
+        .btn-p{
+            background-color: #12bbe11b;
+            color: #00C2FF;
+            border: 1px solid #00C2FF;
+            border-radius: 10px;
+            padding: 1px 25px;
+            font-size: 14px;
+        }
+        .user-info-container{
+            height: 350px;
+        }
+        .info-section{
+            position:relative;
+            left: 45%;
+            top: 7%;
+            width: 70%;
+            padding: 10px;
+        }
+        .label {
+            position: relative;
+            left: 0%;
+            font-size: 22px;
+            font-weight: bold;
+            color: #000000;
+            text-decoration: underline;
+        }
+        .user-info{
+            font-size: 14px;
+
+            color: #000000;
+        }
+        .profile-pic{
+            position:absolute;
+            width: 40%;
+            top: 0;
+            left: 0;
+        }
+        .white-back{
+            position:relative;
+            background-color: #F6F6F6;
+            border-radius: 10px;
+         
+            
+        }
+        .seperator {
+            width: 90%;
+            display: block;
+            margin: 0 auto;
+            }
+    
+    </style>
 {% endblock %}

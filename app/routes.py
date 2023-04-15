@@ -1,9 +1,9 @@
 from datetime import datetime
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, SeeAvailableRoomsForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
 from sqlalchemy import func
@@ -66,17 +66,28 @@ def load_room_csv_to_database():
                 db.session.commit()
 
 
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    
     #load_hotel_csv_to_database()
     #load_room_csv_to_database()
+    if "location" in session:
+        session.pop("location", None)
+    if "check_in" in session:
+        session.pop("check_in", None)
+    if "check_out" in session:
+        session.pop("check_out", None)
     form = HotelSearchForm()
     if form.validate_on_submit():
         #check if checkout date is after checkin date
         if form.check_out.data < form.check_in.data:
             flash('Check-out date must be after check-in date')
             return redirect(url_for('home'))
-        return redirect(url_for('sresults', city=str(form.location.data), check_in=str(form.check_in.data), check_out=str(form.check_out.data)))
+        session["location"] = form.location.data
+        session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
+        session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
+        return redirect(url_for('sresults'))
     
     if request.method == "GET":
         #read cities.csv into cities without quotes
@@ -109,19 +120,43 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
 
-@app.route('/sresults/<city>/<check_in>/<check_out>', methods=['GET', 'POST'])
-def sresults(city, check_in, check_out):
+@app.route('/sresults', methods=['GET', 'POST'])
+def sresults():
+    if "hotel_id" in session:
+        session.pop("hotel_id", None)
+    if "location" not in session:
+        flash('Session data is missing. Please enter search criteria again.')
+        return redirect(url_for('home'))
+    location = session["location"]
+    if "check_in" in session and "check_out" in session:
+        check_in = datetime.strptime(session["check_in"], "%Y-%m-%d")
+        check_out = datetime.strptime(session["check_out"], "%Y-%m-%d")
+        form = HotelSearchForm(location=location, check_in=check_in, check_out=check_out)
+    else:
+        form = HotelSearchForm(location=location)
     #if city contains a , then it is a city, state pair # remove the state and , from the city
-    if ',' in city:
-        city = city.split(',')[0]
+    if ',' in location:
+        city = location.split(',')[0]
+    else:
+        city = location
     results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).all()
-    return render_template('sresults.html', city=city, hotels=results, check_in_date=check_in, check_out_date=check_out)
+    if form.validate_on_submit():
+        if form.check_out.data < form.check_in.data:
+            flash('Check-out date must be after check-in date')
+            return redirect(url_for('sresults'))
+        session["location"] = form.location.data
+        session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
+        session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
+        return redirect(url_for('sresults'))
+    return render_template('sresults.html', city=city, hotels=results, form=form)
 
-@app.route('/hotel/<hotel_id>/<check_in>/<check_out>')
-def hotel(hotel_id, check_in, check_out):
-
-    check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
-    check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
+@app.route('/hotel/<hotel_id>')
+def hotel(hotel_id):
+    if "check_in" not in session or "check_out" not in session:
+        flash('Please enter a check-in and check-out date. Before preceding to the hotel page.')
+        return redirect(url_for('sresults'))
+    check_in_dt = datetime.strptime(session["check_in"], "%Y-%m-%d")
+    check_out_dt = datetime.strptime(session["check_out"], "%Y-%m-%d")
     # Code to fetch hotel information for the given hotel_id
     hotel_info = Hotel.query.filter_by(id=hotel_id).first()
     #find the rooms for the hotel
@@ -146,12 +181,17 @@ def hotel(hotel_id, check_in, check_out):
 
     # Code to render the hotel page template with the hotel information
     # ...
+    session["hotel_id"] = hotel_id
+    return render_template('hotel.html', hotel_info=hotel_info, rooms=rooms)
 
-    return render_template('hotel.html', hotel_info=hotel_info, rooms=rooms, check_in=check_in, check_out=check_out)
-
-@app.route('/reserve/<room_id>/<check_in>/<check_out>', methods=['GET', 'POST'])
+@app.route('/reserve/<room_id>', methods=['GET', 'POST'])
 @login_required
-def reserve(room_id, check_in, check_out):
+def reserve(room_id):
+    if "check_in" not in session or "check_out" not in session:
+        flash('Please enter a check-in and check-out date. Before reserving a room.')
+        return redirect(url_for('sresults'))
+    check_in = session["check_in"]
+    check_out = session["check_out"]
     form = ReserveRoomForm()
     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
     check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
@@ -222,7 +262,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-
+"""
 @app.route('/user/<username>')
 @login_required
 def user(username):
@@ -236,7 +276,19 @@ def user(username):
     form = EmptyForm()
     return render_template('user.html', user=user, posts=posts.items,
                            next_url=next_url, prev_url=prev_url, form=form)
+"""
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    #ensure that the user is not trying to access a user that is not them
+    if user != current_user:
+        abort(403)
 
+    #query user's reservations
+    reservations = Reservation.query.filter_by(user_id=current_user.id).all()
+    return render_template('user.html', reservations=reservations, user=user)
+  
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -323,3 +375,18 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+
+@app.route('/submit/<city>', methods=['GET'])
+def submit(city):
+    if city == 'la':
+        session["location"] = "Los Angeles, California"
+        return redirect(url_for('sresults'))
+    elif city == 'sf':
+        session["location"] = "San Francisco, California"
+        return redirect(url_for('sresults'))
+    elif city == 'ny':
+        session["location"] = "New York, New York"
+        return redirect(url_for('sresults'))
+    else :
+        return redirect(url_for('home'))

@@ -1,0 +1,70 @@
+.text{
+font-size: 14px;
+}
+.listing_info{
+display: grid;
+background-color: brown;
+}
+.checked {
+color: orange;
+}
+.hotel_grid{
+display: grid;
+grid-template-columns: repeat(3,1fr);
+grid-gap: 2.5rem;
+overflow:hidden
+}
+.hotel_listing{
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 1rem;
+background-color: #e6e3e3;
+max-width: 750px;
+height: 275px;
+position: relative;
+border-radius: 10px;
+overflow: hidden;
+}
+.hotel_info {
+display: flex;
+flex-direction: column;
+align-items: center;
+position: absolute;
+top: 40%;
+}
+.hotel-image{
+height: 150px;
+width: 100%;
+object-fit: cover;
+position: absolute;
+top: 0;
+left: 0;
+}
+.hotel-name {
+font-size: 20px;
+font-weight: bold;
+text-decoration: underline;
+margin-bottom: 5px;
+}
+.hotel-price{
+}
+.hotel-rating{
+font-size: 18px;
+
+}
+.book-btn{
+background-color: #12bbe11b;
+color: #00C2FF;
+border: 1px solid #00C2FF;
+border-radius: 10px;
+padding: 1px 35px;
+font-size: 20px;
+}
+.inner-container {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.page-title {
+    font-size: 24px;
+}

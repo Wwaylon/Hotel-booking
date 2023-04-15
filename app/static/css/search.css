@@ -1,0 +1,57 @@
+.grid_container{
+display: grid;
+grid-template-columns: 3fr;
+grid-template-rows: 1fr;
+grid-column-gap: 10px;
+grid-row-gap: 0px;
+z-index: 1;
+margin-bottom: 10px;
+margin-left : 13px;
+margin-right : 13px;
+}
+.form_grid {
+display: grid;
+grid-row: 1;
+background-color: #5bb6ef00;
+padding-left: 10px;
+padding-right: 10px;
+border-radius: 10px;
+grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+grid-template-rows:  2fr;
+grid-gap: 15px;
+}
+.location-form{
+font-size: 20px;
+box-sizing: border-box;
+margin-bottom: 10px;
+}
+.dtpick{
+font-size:20px;
+margin-bottom: 10px;
+}
+.button{
+font-size: 20px;
+margin-bottom: 10px;
+color:white;
+font-weight: bold;
+background-color: rgb(255, 131, 7);
+border-radius: 15px;
+border-width: 1px;
+border-color: grey;
+}
+.button:hover{
+background-color: rgb(219, 109, 0);
+}
+.item {
+display: grid;
+box-sizing: border-box;
+}
+.item1 {
+grid-column: 1 / 3;
+display: grid;
+box-sizing: border-box;
+}
+.dtpick
+{
+color: gray;
+}

@@ -6,6 +6,7 @@
 
 {% block body %}
     <body>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lexend">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     {% block navbar %}
         <nav class="navbar navbar-default">
@@ -56,7 +57,7 @@
         <style>
             .main_container {
                 background-color: #B4A79A;
-                width: min(960px, 90%);
+                width: min(800px, 90%);
                 margin: 0 auto;
                 border-radius: 10px;
                 padding: 15px;
@@ -101,11 +102,8 @@
             font-family: 'nmachina', sans-serif;
             background-color: white;
             }
-            @font-face {
-            font-family: 'nmachina';
-            src: url('static/fonts/PPNeueMachina-InktrapRegular.otf') format('otf');
-            font-weight: normal;
-            font-style: normal;
+            html * {
+            font-family: 'lexend', sans-serif;
             }
             .logo {
             width: 70%;

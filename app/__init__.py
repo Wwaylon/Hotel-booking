@@ -14,5 +14,6 @@ login = LoginManager(app)
 login.login_view = 'login'
 bootstrap = Bootstrap(app)
 mail = Mail(app)
+app.secret_key = "RandomKey12323213231"
 
 from app import routes, models, errors

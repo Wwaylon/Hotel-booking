@@ -73,3 +73,6 @@ class ResetPasswordForm(FlaskForm):
 
 class ReserveRoomForm(FlaskForm):
     reserve = SubmitField('Reserve')
+
+class SeeAvailableRoomsForm(FlaskForm):
+    submit = SubmitField('See Available Rooms')
