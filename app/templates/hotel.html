@@ -79,7 +79,7 @@
                         <i class="fa fa-star"></i>
                     {% endif %}
                 {% endfor %}
-                <i>- {{hotel_info.rating}} rating</i>
+                <i>- {{hotel_info.rating}}&#9733;</i>
                 <p>{{hotel_info.address}}, {{hotel_info.city}}, {{hotel_info.state}} {{hotel_info.postal_code}}, {{hotel_info.country}}</p>
                 <p>Phone Number: {{hotel_info.phone}}</p>
                 <p>Email: {{hotel_info.email}}</p>
@@ -109,7 +109,7 @@
                 </li>
                 {% for page in range(1, num_pages + 1) %}
                 <li class="page-item {% if page == current_page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('hotel', hotel_id=hotel_info.id, page=page) }}">{{ page }}</a>
+                    <a class="page-link numbered" href="{{ url_for('hotel', hotel_id=hotel_info.id, page=page) }}">{{ page }}</a>
                 </li>
                 {% endfor %}
                 <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
@@ -152,7 +152,7 @@
             </li>
             {% for page in range(1, num_pages + 1) %}
             <li class="page-item {% if page == current_page %}active{% endif %}">
-                <a class="page-link" href="{{ url_for('hotel', hotel_id=hotel_info.id, page=page) }}">{{ page }}</a>
+                <a class="page-link numbered" href="{{ url_for('hotel', hotel_id=hotel_info.id, page=page) }}">{{ page }}</a>
             </li>
             {% endfor %}
             <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
@@ -163,8 +163,10 @@
             </li>
             </ul>
         </nav>
-  
     </div>
+    <footer>
+        <p>&copy; 2023 LikeHome. All rights reserved.</p>
+    </footer>
   </div> <!-- End of .container -->
   
 

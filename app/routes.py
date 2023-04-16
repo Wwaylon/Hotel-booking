@@ -14,6 +14,8 @@ import requests
 import os
 import math
 basedir = os.path.abspath(os.path.dirname(__file__))
+global prev_sort_option 
+prev_sort_option = ''
 
 
 @app.before_request
@@ -208,7 +210,7 @@ def sresults():
 def hotel(hotel_id):
     if "check_in" not in session or "check_out" not in session:
         flash('Please enter a check-in and check-out date. Before preceding to the hotel page.')
-        return redirect(url_for('home'))
+        return redirect(url_for('sresults'))
     check_in_dt = datetime.strptime(session["check_in"], "%Y-%m-%d")
     check_out_dt = datetime.strptime(session["check_out"], "%Y-%m-%d")
     form = CheckInCheckOutForm(check_in=check_in_dt, check_out=check_out_dt)
@@ -234,17 +236,25 @@ def hotel(hotel_id):
             for room in rooms:
                 if room.id == reservation.room_id:
                     rooms.remove(room)
-
-    sort_option = request.args.get('sort', 'lh', type=str)
+    global prev_sort_option
+    sort_option = request.args.get('sort')
+    page = request.args.get('page', 1, type=int)
+    if sort_option != prev_sort_option and sort_option is not None:
+        page = 1
+    else: 
+        sort_option = prev_sort_option
     if sort_option == 'lh':
         rooms.sort(key=lambda x: x.pricepn)
     elif sort_option == 'hl':
         rooms.sort(key=lambda x: x.pricepn, reverse=True)
     else:
-        rooms.sort(key=lambda x: x.pricepn)
-        sort_option = 'lh'
+        sort_option = 'prev_sort_option'
+        if sort_option == 'lh':
+            rooms.sort(key=lambda x: x.pricepn)
+        elif sort_option == 'hl':
+            rooms.sort(key=lambda x: x.pricepn, reverse=True)
+    prev_sort_option = sort_option
 
-    page=request.args.get('page', 1, type=int)
     rooms_per_page = 10
     num_pages = int(math.ceil(len(rooms) / rooms_per_page))
     start_index = (page - 1) * rooms_per_page

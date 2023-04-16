@@ -89,6 +89,11 @@ top: 70%;
   .pagination .page-link {
     color: #000; /* Set text color to black */
   }
+
+  .pagination .numbered:hover{
+    border-top: 2px solid rgb(26, 25, 25);
+    border-bottom: 2px solid rgb(9, 9, 9);
+  }
   
   .pagination .page-item.disabled .page-link {
     cursor: not-allowed;
@@ -100,6 +105,7 @@ top: 70%;
   
   .pagination .page-item.active .page-link:hover {
     border-top: 2px solid orange;
+    border-bottom: 2px solid orange;
   }
   
   .pagination .page-link:hover {
