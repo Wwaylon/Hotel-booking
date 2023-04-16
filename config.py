@@ -14,3 +14,5 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('GMAIL')
     MAIL_PASSWORD = os.environ.get('PASSWORD')
     ADMINS = ['cmpe165app@gmail.com']
+    GOOGLEMAPS_KEY = os.environ.get('GMAPS_API')
+    ROOMS_PER_PAGE = 10

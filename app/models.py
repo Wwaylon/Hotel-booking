@@ -101,6 +101,9 @@ class Hotel(db.Model):
     country = db.Column(db.String)
     rooms = db.relationship('Room', backref='hotel', lazy='dynamic')
     rating = db.Column(db.Float)
+    website = db.Column(db.String)
+    phone = db.Column(db.String)
+    email = db.Column(db.String)
     hdescript = db.Column(db.Integer)
 
     img1 = db.Column(db.String)
@@ -114,13 +117,13 @@ class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     pricepn = db.Column(db.Integer)
     wifi = db.Column(db.Boolean)
-    pool = db.Column(db.Boolean)
     htub = db.Column(db.Boolean)
-    petfr = db.Column(db.Boolean)
     ac = db.Column(db.Boolean)
     elevator = db.Column(db.Boolean)
     room_type = db.Column(db.String)
-
+    bed_count = db.Column(db.Integer)
+    bed = db.Column(db.String)
+    sqft = db.Column(db.Integer)
     hotel_id = db.Column(db.Integer, db.ForeignKey('hotel.id'))
 
 

@@ -3,12 +3,17 @@ from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, SeeAvailableRoomsForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
 from sqlalchemy import func
 import csv
 from datetime import datetime
+from flask_googlemaps import GoogleMaps, Map
+import requests
+import os
+import math
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 @app.before_request
@@ -17,6 +22,50 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
+
+def load_data():
+    with open('app/static/hotels.csv', 'r') as file:
+        reader = csv.DictReader(file)
+        hotels = []
+        for row in reader:
+            hotel = {
+                'id': int(row['id']),
+                'name': row['name'].strip(),
+                'address': row['address'].strip(),
+                'postal_code': int(row['postal_code']),
+                'city': row['city'].strip(),
+                'state': row['state'].strip(),
+                'country': row['country'].strip(),
+                'rating': float(row['rating']),
+                'hdescript': (row['hdescript']).strip(),
+                'img1': row['img1'].strip(),
+                'img2': row['img2'].strip(),
+                'img3': row['img3'].strip(),
+                'website': row['website'].strip(),
+                'phone': row['phone number'].strip(),
+                'email': row['email'].strip()
+            }
+            hotels.append(hotel)
+    with open('app/static/rooms.csv', 'r') as file:
+        reader = csv.DictReader(file)
+        rooms = []
+        for row in reader:
+            room = {
+                'id': int(row['id']),
+                'pricepn': int(row['pricepn']),
+                'wifi': bool(int(row['wifi'])),
+                'ac': bool(int(row['ac'])),
+                'elevator': bool(int(row['elevator'])),
+                'room_type': row['room_type'].strip(),
+                'bed_count': int(row['bed_count']),
+                'bed': row['bed'].strip(),
+                'sqft': int(row['sqft']),
+                'hotel_id': int(row['hotel_id'])
+            }
+            rooms.append(room)
+    db.session.bulk_insert_mappings(Hotel, hotels)
+    db.session.bulk_insert_mappings(Room, rooms)
+    db.session.commit()
 
 def load_hotel_csv_to_database():
     with open('app/static/hotels.csv', 'r') as file:
@@ -35,7 +84,10 @@ def load_hotel_csv_to_database():
                           hdescript=(row['hdescript']).strip(),
                           img1=row['img1'].strip(),
                           img2=row['img2'].strip(),
-                          img3=row['img3'].strip())
+                          img3=row['img3'].strip(),
+                          website = row['website'].strip(),
+                          phone = row['phone'].strip(),
+                        email = row['email'].strip())
             # Add the new hotel to the database
             db.session.add(hotel)
             # Commit the changes to the database
@@ -45,6 +97,7 @@ def load_room_csv_to_database():
     with open('app/static/rooms.csv', 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
+            print(row['id'])
             # Find the hotel associated with the room
             hotel = Hotel.query.filter_by(id=int(row['hotel_id'])).first()
 
@@ -60,6 +113,7 @@ def load_room_csv_to_database():
                             elevator=bool(int(row['elevator'])),
                             room_type=row['room_type'].strip(),
                             hotel_id=int(row['hotel_id']))
+                
                 # Add the new room to the database
                 db.session.add(room)
                 # Commit the changes to the database
@@ -69,9 +123,9 @@ def load_room_csv_to_database():
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    
-    #load_hotel_csv_to_database()
-    #load_room_csv_to_database()
+    #load_data()
+    #load_hotel_csv_to_database() NOT NEEDED USE  THE LOAD DATA FUNCTION ABOVE> WAY FASTER
+    #load_room_csv_to_database()NOT NEEDED USE  THE LOAD DATA FUNCTION ABOVE> WAY FASTER
     if "location" in session:
         session.pop("location", None)
     if "check_in" in session:
@@ -150,39 +204,78 @@ def sresults():
         return redirect(url_for('sresults'))
     return render_template('sresults.html', city=city, hotels=results, form=form)
 
-@app.route('/hotel/<hotel_id>')
+@app.route('/hotel/<hotel_id>', methods=['GET', 'POST'])
 def hotel(hotel_id):
     if "check_in" not in session or "check_out" not in session:
         flash('Please enter a check-in and check-out date. Before preceding to the hotel page.')
-        return redirect(url_for('sresults'))
+        return redirect(url_for('home'))
     check_in_dt = datetime.strptime(session["check_in"], "%Y-%m-%d")
     check_out_dt = datetime.strptime(session["check_out"], "%Y-%m-%d")
+    form = CheckInCheckOutForm(check_in=check_in_dt, check_out=check_out_dt)
+    if form.validate_on_submit():
+        if form.check_out.data < form.check_in.data:
+            flash('Check-out date must be after check-in date')
+            return redirect(url_for('hotel', hotel_id=hotel_id))
+        session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
+        session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
+        return redirect(url_for('hotel', hotel_id=hotel_id))
+
+
     # Code to fetch hotel information for the given hotel_id
     hotel_info = Hotel.query.filter_by(id=hotel_id).first()
     #find the rooms for the hotel
     rooms = Room.query.filter_by(hotel_id=hotel_id).all()
-    print(rooms)
     #find the reservations the overlap with the checkin and checkout dates
     reservations = Reservation.query.filter(Reservation.room_id.in_([room.id for room in rooms])).all()
-    print(reservations)
-    for res in reservations:
-        print(res.room_id)
-        print(res.check_in)
-        print(res.check_out)
     #remove the rooms that are reserved during the checkin and checkout dates
     for reservation in reservations:
         if reservation.check_in <= check_in_dt <= reservation.check_out or reservation.check_in <= check_out_dt <= reservation.check_out:
-            print("trigger")
             #find the room that is reserved and remove it from the list of rooms
             for room in rooms:
                 if room.id == reservation.room_id:
                     rooms.remove(room)
-    print(rooms)
 
+    sort_option = request.args.get('sort', 'lh', type=str)
+    if sort_option == 'lh':
+        rooms.sort(key=lambda x: x.pricepn)
+    elif sort_option == 'hl':
+        rooms.sort(key=lambda x: x.pricepn, reverse=True)
+    else:
+        rooms.sort(key=lambda x: x.pricepn)
+        sort_option = 'lh'
+
+    page=request.args.get('page', 1, type=int)
+    rooms_per_page = 10
+    num_pages = int(math.ceil(len(rooms) / rooms_per_page))
+    start_index = (page - 1) * rooms_per_page
+    end_index = start_index + rooms_per_page
+    rooms = rooms[start_index:end_index]
+
+    #append address, city, state, postal code, and country to address
+    address = hotel_info.address + ', ' + hotel_info.city + ', ' + hotel_info.state + ', ' + str(hotel_info.postal_code) + ', ' + hotel_info.country
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+    "address": address,
+    "key": os.environ.get('GMAPS_API')  # Replace with your API key
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    if data["status"] == "OK":
+        result = data["results"][0]
+        lat = result["geometry"]["location"]["lat"]
+        lng = result["geometry"]["location"]["lng"]
+        mymap = Map(
+            identifier="view-side",
+            lat=lat,
+            lng=lng,
+            markers=[(lat, lng)]
+        )
+    else:
+        print("Geocoding failed. Please check your address and API key.")               
     # Code to render the hotel page template with the hotel information
     # ...
     session["hotel_id"] = hotel_id
-    return render_template('hotel.html', hotel_info=hotel_info, rooms=rooms)
+    return render_template('hotel.html', hotel_info=hotel_info, rooms=rooms, form=form, mymap = mymap, num_pages=num_pages, current_page=page, sort_option=sort_option)
 
 @app.route('/reserve/<room_id>', methods=['GET', 'POST'])
 @login_required
@@ -197,8 +290,6 @@ def reserve(room_id):
     check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
     if form.validate_on_submit():
         # Code to reserve the room for the given room_id
-        # ...
-
         reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
         print (reservation_obj.room_id, reservation_obj.check_in, reservation_obj.check_out, reservation_obj.user_id)
         db.session.add(reservation_obj)

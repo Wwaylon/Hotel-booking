@@ -60,6 +60,11 @@ class HotelSearchForm(FlaskForm):
     check_out = DateField('Check-out Date', format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Search')
 
+class CheckInCheckOutForm(FlaskForm):
+    check_in = DateField('Check-in Date', format='%Y-%m-%d', validators=[DataRequired()])
+    check_out = DateField('Check-out Date', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()], render_kw=dict(class_='email-form', placeholder='email@placeholder.com'))

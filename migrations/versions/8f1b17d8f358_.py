@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 79cfa9ada201
+Revision ID: 8f1b17d8f358
 Revises: 
-Create Date: 2023-04-05 18:41:08.125986
+Create Date: 2023-04-15 23:12:09.572851
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '79cfa9ada201'
+revision = '8f1b17d8f358'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,6 +27,9 @@ def upgrade():
     sa.Column('state', sa.String(), nullable=True),
     sa.Column('country', sa.String(), nullable=True),
     sa.Column('rating', sa.Float(), nullable=True),
+    sa.Column('website', sa.String(), nullable=True),
+    sa.Column('phone', sa.String(), nullable=True),
+    sa.Column('email', sa.String(), nullable=True),
     sa.Column('hdescript', sa.Integer(), nullable=True),
     sa.Column('img1', sa.String(), nullable=True),
     sa.Column('img2', sa.String(), nullable=True),
@@ -67,12 +70,13 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
     sa.Column('pricepn', sa.Integer(), nullable=True),
     sa.Column('wifi', sa.Boolean(), nullable=True),
-    sa.Column('pool', sa.Boolean(), nullable=True),
     sa.Column('htub', sa.Boolean(), nullable=True),
-    sa.Column('petfr', sa.Boolean(), nullable=True),
     sa.Column('ac', sa.Boolean(), nullable=True),
     sa.Column('elevator', sa.Boolean(), nullable=True),
     sa.Column('room_type', sa.String(), nullable=True),
+    sa.Column('bed_count', sa.Integer(), nullable=True),
+    sa.Column('bed', sa.String(), nullable=True),
+    sa.Column('sqft', sa.Integer(), nullable=True),
     sa.Column('hotel_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['hotel_id'], ['hotel.id'], ),
     sa.PrimaryKeyConstraint('id')
