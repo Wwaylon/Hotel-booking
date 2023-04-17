@@ -18,6 +18,8 @@ global prev_sort_option
 prev_sort_option = ''
 
 
+
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -195,7 +197,27 @@ def sresults():
         city = location.split(',')[0]
     else:
         city = location
-    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).all()
+    
+    hotels_per_page = 9
+    page = request.args.get('page', 1, type=int)
+    sort_option = request.args.get('sort')
+    # Store previous sort option in a separate variable
+    # If the sort option has changed, reset the page number to 1
+    if sort_option != session["previous_sort_option"] and sort_option is not None:
+        page = 1
+    
+    # if sort option is "lh" then sort by price low to high
+    if sort_option is None: 
+        sort_option = session["previous_sort_option"]
+
+    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).order_by(Hotel.rating.desc() if sort_option == "hl" else Hotel.rating.asc()).paginate(page=page, per_page=hotels_per_page)
+
+    # Store the current sort option in the session
+    session["previous_sort_option"] = sort_option
+    print(session["previous_sort_option"])
+
+    num_pages = results.pages
+
     if form.validate_on_submit():
         if form.check_out.data < form.check_in.data:
             flash('Check-out date must be after check-in date')
@@ -203,8 +225,8 @@ def sresults():
         session["location"] = form.location.data
         session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
         session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
-        return redirect(url_for('sresults'))
-    return render_template('sresults.html', city=city, hotels=results, form=form)
+        return redirect(url_for('sresults', page=1))
+    return render_template('sresults.html', city=city, hotels=results.items, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option)
 
 @app.route('/hotel/<hotel_id>', methods=['GET', 'POST'])
 def hotel(hotel_id):
@@ -248,7 +270,7 @@ def hotel(hotel_id):
     elif sort_option == 'hl':
         rooms.sort(key=lambda x: x.pricepn, reverse=True)
     else:
-        sort_option = 'prev_sort_option'
+        sort_option = prev_sort_option
         if sort_option == 'lh':
             rooms.sort(key=lambda x: x.pricepn)
         elif sort_option == 'hl':

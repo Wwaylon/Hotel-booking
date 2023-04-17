@@ -1,248 +1,248 @@
 header {
-padding: 0px;
-padding-top: 10px;
-padding-bottom: 10px;
-margin-bottom: 10px;
-background-color: rgb(255, 131, 7);
-border-bottom: 1px solid #bdbdbd;
-}
-.navigation {
-max-width: 950px;
-padding-left: 20px;
-margin: 0 auto;
-display: flex;
-justify-content: space-between; /* Positions items to the start and end of the header */
-align-items: center; /* Vertically centers items within the header */
-background-color: transparent;
-}
-.website-logo{
-width: 25px;
-height: auto;
-vertical-align: middle;
-padding-bottom: 5px;
-margin-left: 0px;
-}
-#website-name {
-margin: 0; /* Reset default margin */
-text-decoration: none;
-color: #ffffff;
-font-size: 25px;
-font-weight: bold;
-}
-
-nav ul {
-list-style-type: none;
-margin: 0;
-padding: 0;
-}
-
-nav li {
-display: inline;
-margin-right: 15px;
-}
-
-nav a {
-color: #ffffff;
-text-decoration: none;
-font-weight: bold;
-padding: 5px;
-border-radius: 5px;
-}
-
-nav a:hover {
-color: rgb(255 255 0);
-}
-.container {
-max-width: 950px; /* Set the maximum width of the container */
-margin: 0 auto; /* Center the container horizontally */
-background-color: transparent;
-}
-body {
-background: #f6f6f6;
-margin: 0; /* Reset default margin */
-}
-
-html * {
-font-family: 'Roboto', sans-serif;
-}
-.image-with-text {
-position: relative;
-max-width: 100%;
-border-radius: 10px;
-margin-left : 20px;
-margin-right : 20px;
-overflow: hidden;
-}
-
-.image-with-text img {
-width: 100%;
-height: min(50vh, 60vw);
-object-fit: cover;
-vertical-align: bottom;
-object-position: bottom;
-}
-
-.text-overlay {
-position: absolute;
-bottom: 0;
-left: 0;
-right: 0;
-padding: 20px;
-background: rgb(255,128,0);
-background: linear-gradient(90deg, rgba(255,128,0,1) 28%, rgba(66,161,170,0) 51%);
-color: #000000;
-opacity: 0.9;
-width: 100%;
-height: 91%;
-}
-
-.text-overlay h2 {
-font-size: 35px;
-font-weight: bold;
-margin: 0;
-}
-
-.text-overlay p {
-font-size: 20px;
-margin: 10px 0 0;
-}
-
-.grid_container{
-display: grid;
-grid-template-columns: 3fr;
-grid-template-rows: 1fr;
-grid-column-gap: 10px;
-grid-row-gap: 0px;
-z-index: 1;
-margin-bottom: 10px;
-margin-left : 13px;
-margin-right : 13px;
-}
-.form_grid {
-display: grid;
-grid-row: 1;
-background-color: #5bb6ef00;
-padding-left: 10px;
-padding-right: 10px;
-border-radius: 10px;
-grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-grid-template-rows:  2fr;
-grid-gap: 15px;
-}
-.location-form{
-font-size: 20px;
-box-sizing: border-box;
-margin-bottom: 10px;
-}
-.dtpick{
-font-size:20px;
-margin-bottom: 10px;
-}
-.button{
-font-size: 20px;
-margin-bottom: 10px;
-color:white;
-font-weight: bold;
-background-color: rgb(255, 131, 7);
-border-radius: 15px;
-border-width: 1px;
-border-color: grey;
-}
-.button:hover{
-background-color: rgb(219, 109, 0);
-}
-.item {
-display: grid;
-box-sizing: border-box;
-}
-.item1 {
-grid-column: 1 / 3;
-display: grid;
-box-sizing: border-box;
-}
-.dtpick
-{
-color: gray;
-}
-
-/* Popular Cities Section */
-#popular-cities {
-margin-top: 20px;
-margin-bottom: 20px;
-margin-left: 20px;
-margin-right: 20px;
-}
-#popular-cities h2 {
-font-size: 35px;
-text-align: center;
-margin-bottom: 10px;
-margin-top: 10px;
-}
-.popular-city-grid-container
-{
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-grid-auto-flow: dense; /* Allows items to overflow to the next row */
-grid-gap: 10px;
-}
-.popular-city-grid-item
-{
-position: relative;
-overflow: hidden;
-border-radius: 10px;
-width: 100%;
-height: 166px;
-}
-.popular-city-grid-item img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-vertical-align: bottom;
-object-position: bottom;
-}
-.popular-city-grid-item:hover img {
-opacity: 0.7; /* Set opacity on hover */
-cursor: pointer; /* Change cursor to indicate clickability */
-}
-footer{
-margin-left: 20px;
-margin-right: 20px;
-text-align: center;
-}
-.popular-city-grid-item .text-overlay {
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-padding: 0px;
-background: rgba(0, 0, 0, 0.381); /* Use rgba to specify transparent grey color */
-color: #ffffff; /* Change text color to white */
-opacity: 0;
-width: 100%;
-height: 100%;
-transition:  opacity 0.3s ease; 
-display: flex;
-justify-content: center;
-align-items: center;
-
-}
-
-.popular-city-grid-item h3{
-font-size: 24px;
-font-weight: bold;
-}
-.popular-city-grid-item:hover .text-overlay {
-opacity: 1; /* Set opacity to 1 on hover */
-}
-
-.flash {
-padding: 10px;
-margin-bottom: 10px;
-font-size: 16px;
-border-radius: 4px;
-background-color: #f8d7da;
-color: #ff0019;
-border: 1px solid #d11326;
-margin-left: 20px;
-margin-right: 20px;
-}
+    padding: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    background-color: rgb(255, 131, 7);
+    border-bottom: 1px solid #bdbdbd;
+    }
+    .navigation {
+    max-width: 950px;
+    padding-left: 20px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between; /* Positions items to the start and end of the header */
+    align-items: center; /* Vertically centers items within the header */
+    background-color: transparent;
+    }
+    .website-logo{
+    width: 25px;
+    height: auto;
+    vertical-align: middle;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    }
+    #website-name {
+    margin: 0; /* Reset default margin */
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: bold;
+    }
+    
+    nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    }
+    
+    nav li {
+    display: inline;
+    margin-right: 15px;
+    }
+    
+    nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+    }
+    
+    nav a:hover {
+    color: rgb(255 255 0);
+    }
+    .container {
+    max-width: 950px; /* Set the maximum width of the container */
+    margin: 0 auto; /* Center the container horizontally */
+    background-color: transparent;
+    }
+    body {
+    background: #f6f6f6;
+    margin: 0; /* Reset default margin */
+    }
+    
+    html * {
+    font-family: 'Roboto', sans-serif;
+    }
+    .image-with-text {
+    position: relative;
+    max-width: 100%;
+    border-radius: 10px;
+    margin-left : 20px;
+    margin-right : 20px;
+    overflow: hidden;
+    }
+    
+    .image-with-text img {
+    width: 100%;
+    height: min(50vh, 60vw);
+    object-fit: cover;
+    vertical-align: bottom;
+    object-position: bottom;
+    }
+    
+    .text-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: rgb(255,128,0);
+    background: linear-gradient(90deg, rgba(255,128,0,1) 28%, rgba(66,161,170,0) 51%);
+    color: #000000;
+    opacity: 0.9;
+    width: 100%;
+    height: 91%;
+    }
+    
+    .text-overlay h2 {
+    font-size: 35px;
+    font-weight: bold;
+    margin: 0;
+    }
+    
+    .text-overlay p {
+    font-size: 20px;
+    margin: 10px 0 0;
+    }
+    
+    .grid_container{
+    display: grid;
+    grid-template-columns: 3fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 10px;
+    grid-row-gap: 0px;
+    z-index: 1;
+    margin-bottom: 10px;
+    margin-left : 13px;
+    margin-right : 13px;
+    }
+    .form_grid {
+    display: grid;
+    grid-row: 1;
+    background-color: #5bb6ef00;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-rows:  2fr;
+    grid-gap: 15px;
+    }
+    .location-form{
+    font-size: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    }
+    .dtpick{
+    font-size:20px;
+    margin-bottom: 10px;
+    }
+    .button{
+    font-size: 20px;
+    margin-bottom: 10px;
+    color:white;
+    font-weight: bold;
+    background-color: rgb(255, 131, 7);
+    border-radius: 15px;
+    border-width: 1px;
+    border-color: grey;
+    }
+    .button:hover{
+    background-color: rgb(219, 109, 0);
+    }
+    .item {
+    display: grid;
+    box-sizing: border-box;
+    }
+    .item1 {
+    grid-column: 1 / 3;
+    display: grid;
+    box-sizing: border-box;
+    }
+    .dtpick
+    {
+    color: gray;
+    }
+    
+    /* Popular Cities Section */
+    #popular-cities {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    }
+    #popular-cities h2 {
+    font-size: 35px;
+    text-align: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    }
+    .popular-city-grid-container
+    {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-auto-flow: dense; /* Allows items to overflow to the next row */
+    grid-gap: 10px;
+    }
+    .popular-city-grid-item
+    {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    width: 100%;
+    height: 166px;
+    }
+    .popular-city-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    vertical-align: bottom;
+    object-position: bottom;
+    }
+    .popular-city-grid-item:hover img {
+    opacity: 0.7; /* Set opacity on hover */
+    cursor: pointer; /* Change cursor to indicate clickability */
+    }
+    footer{
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: center;
+    }
+    .popular-city-grid-item .text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0px;
+    background: rgba(0, 0, 0, 0.381); /* Use rgba to specify transparent grey color */
+    color: #ffffff; /* Change text color to white */
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    transition:  opacity 0.3s ease; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    }
+    
+    .popular-city-grid-item h3{
+    font-size: 24px;
+    font-weight: bold;
+    }
+    .popular-city-grid-item:hover .text-overlay {
+    opacity: 1; /* Set opacity to 1 on hover */
+    }
+    
+    .flash {
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    background-color: #f8d7da;
+    color: #ff0019;
+    border: 1px solid #d11326;
+    margin-left: 20px;
+    margin-right: 20px;
+    }
