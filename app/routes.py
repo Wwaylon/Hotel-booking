@@ -136,6 +136,8 @@ def home():
         session.pop("check_in", None)
     if "check_out" in session:
         session.pop("check_out", None)
+    if "previous_sort_option" in session:
+        session.pop("previous_sort_option", None)
     form = HotelSearchForm()
     if form.validate_on_submit():
         #check if checkout date is after checkin date
@@ -203,14 +205,17 @@ def sresults():
     sort_option = request.args.get('sort')
     # Store previous sort option in a separate variable
     # If the sort option has changed, reset the page number to 1
-    if sort_option != session["previous_sort_option"] and sort_option is not None:
-        page = 1
+    if "previous_sort_option" in session:
+        if sort_option != session["previous_sort_option"] and sort_option is not None:
+            page = 1
     
-    # if sort option is "lh" then sort by price low to high
     if sort_option is None: 
-        sort_option = session["previous_sort_option"]
-
-    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).order_by(Hotel.rating.desc() if sort_option == "hl" else Hotel.rating.asc()).paginate(page=page, per_page=hotels_per_page)
+        if "previous_sort_option" in session:
+            sort_option = session["previous_sort_option"]
+        else: 
+            sort_option = "hl"
+    print(sort_option)
+    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).order_by(Hotel.rating.asc() if sort_option == "lh" else Hotel.rating.desc()).paginate(page=page, per_page=hotels_per_page)
 
     # Store the current sort option in the session
     session["previous_sort_option"] = sort_option
