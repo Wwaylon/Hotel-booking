@@ -9,6 +9,7 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
 </head>
 
 <body>
@@ -28,6 +29,13 @@
         </div>
     </header>
     <div class="container-custom">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="flash" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
         <div class="col-md-4 container" style="background-color: #f2f2f2; border-radius: 10px;  padding-bottom: 15px; margin-top: 10%;">
             <h2 class="text-center">Login</h1>
     

@@ -1,82 +1,91 @@
-{% extends 'interiorbase.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{%block page_title %}<b>My Profile</b>  {% endblock %}
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/user.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+</head>
 
-{% block app_content %}
-    <div class="white-back">
-        <div class="user-info-container">
-                <img src="{{ url_for('static', filename= 'default-user.png') }}" class="profile-pic"> 
-                <div class ="info-section">
-                    <dl>
-                        <dt class="label">User Information</h1>
-                        <dd class="user-info"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Username:</b> </p>
-                        <dt class="label">Email Address</h1>
-                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email address:</b> </p>
-                        <dt class="label">Reward Points</h1>
-                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total Points:</b> </p>
-                        <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="btn-p">Change Password</a> </dt>
-                    </dl>
-                </div> 
+<body>
+    <header>
+        <div class="navigation">
+            <a href="{{url_for('home')}}" id="website-name">Like<span style="color: rgb(255, 255, 0)">Home</span>
+                <svg class="website-logo" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></a>
+            <nav>
+                <ul>
+                <li><a href="{{url_for('home')}}">Home</a></li>
+                <li><a href="#">About</a></li>
+                {% if current_user.is_anonymous %}
+                  <li><a href="{{url_for('login')}}">Login</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                  <li><a href="{{url_for('logout')}}">Logout</a></li>
+                {% endif %}
+                </ul>
+            </nav>
         </div>
-        <img src="{{ url_for('static', filename= 'seperator.svg') }}" class ="seperator">
-        <div class="reservations-grid" > 
-            <h1 class="label">Active Reservations</h1>
-
-            <h1 class="label">Past Reservations</h1>
-
+    </header> 
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="flash" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="inner-container">
+        <div class="user-info-section">
+            <h1>{{user.username|title}}</h1>
+            <h4>{{user.f_name|title}} {{user.l_name|title}}</h4>
+            <h4>{{user.email}}</h4>
         </div>
+        <div class="section-divider"> </div>  
+        <div class="reservations-section">
+            <h2>Active Reservations</h2>
+            {% for reservation in active_reservations %}
+            <div class="reservation">
+                <img src="{{ url_for('static', filename= reservation.img1) }}" alt="Img not loaded" class="hotel-image">
+                <div class="reservation-info">
+                    <h2>{{ reservation.hotel_name }}</h2>
+                    <h3>{{ reservation.room |title}}, {{ reservation.bed_count |title }} {{ reservation.bed |title}}</h3>
+                    <p>{{reservation.hotel_address}}, {{reservation.hotel_city}}, {{reservation.hotel_state}} {{reservation.hotel_postal_code}}, {{reservation.hotel_country}}</p>
+                    <p>Check-in Date: {{ reservation.check_in }} </p>
+                    <p>Check-out Date: {{ reservation.check_out }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            <h2>Past Reservations</h2>
+            {% for reservation in past_reservations %}
+            <div class="reservation">
+                <p>Hotel Name: {{ reservation.hotel_name }}</p>
+                <p>Hotel Address: {{ reservation.hotel_address }}</p>
+                <p>Hotel City: {{ reservation.hotel_city }}</p>
+                <p>Hotel State: {{ reservation.hotel_state }}</p>
+                <p>Hotel Postal Code: {{ reservation.hotel_postal_code }}</p>
+                <p>Hotel Country: {{ reservation.hotel_country }}</p>
+                <p>Check-in Date: {{ reservation.check_in }}</p>
+                <p>Room Type: {{ reservation.room }}</p>
+                <p>Bed Type: {{ reservation.bed }}</p>
+                <p>Bed Count: {{ reservation.bed_count }}</p>
+                <p>Check-out Date: {{ reservation.check_out }}</p>
+            </div>
+            {% endfor %}
+        </div>  
     </div>
+    <footer>
+        <p>&copy; 2023 LikeHome. All rights reserved.</p>
+    </footer>
+  </div> <!-- End of .container -->
+  
 
-    <style> 
-        .btn-p{
-            background-color: #12bbe11b;
-            color: #00C2FF;
-            border: 1px solid #00C2FF;
-            border-radius: 10px;
-            padding: 1px 25px;
-            font-size: 14px;
-        }
-        .user-info-container{
-            height: 350px;
-        }
-        .info-section{
-            position:relative;
-            left: 45%;
-            top: 7%;
-            width: 70%;
-            padding: 10px;
-        }
-        .label {
-            position: relative;
-            left: 0%;
-            font-size: 22px;
-            font-weight: bold;
-            color: #000000;
-            text-decoration: underline;
-        }
-        .user-info{
-            font-size: 14px;
+</body>
 
-            color: #000000;
-        }
-        .profile-pic{
-            position:absolute;
-            width: 40%;
-            top: 0;
-            left: 0;
-        }
-        .white-back{
-            position:relative;
-            background-color: #F6F6F6;
-            border-radius: 10px;
-         
-            
-        }
-        .seperator {
-            width: 90%;
-            display: block;
-            margin: 0 auto;
-            }
-    
-    </style>
-{% endblock %}
+</html>

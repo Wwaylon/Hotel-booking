@@ -66,6 +66,7 @@ max-width: 1120px; /* Set the maximum width of the container */
 margin: 0 auto; /* Center the container horizontally */
 padding: 0px 25px 25px 25px; /* Add padding inside the container */
 background-color: transparent; 
+flex-direction: column;
 }
 
 

@@ -1,0 +1,82 @@
+{% extends 'interiorbase.html' %}
+
+{%block page_title %}<b>My Profile</b>  {% endblock %}
+
+{% block app_content %}
+    <div class="white-back">
+        <div class="user-info-container">
+                <img src="{{ url_for('static', filename= 'default-user.png') }}" class="profile-pic"> 
+                <div class ="info-section">
+                    <dl>
+                        <dt class="label">User Information</h1>
+                        <dd class="user-info"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Username:</b> </p>
+                        <dt class="label">Email Address</h1>
+                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email address:</b> </p>
+                        <dt class="label">Reward Points</h1>
+                        <dd class="user-info"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total Points:</b> </p>
+                        <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="btn-p">Change Password</a> </dt>
+                    </dl>
+                </div> 
+        </div>
+        <img src="{{ url_for('static', filename= 'seperator.svg') }}" class ="seperator">
+        <div class="reservations-grid" > 
+            <h1 class="label">Active Reservations</h1>
+
+            <h1 class="label">Past Reservations</h1>
+
+        </div>
+    </div>
+
+    <style> 
+        .btn-p{
+            background-color: #12bbe11b;
+            color: #00C2FF;
+            border: 1px solid #00C2FF;
+            border-radius: 10px;
+            padding: 1px 25px;
+            font-size: 14px;
+        }
+        .user-info-container{
+            height: 350px;
+        }
+        .info-section{
+            position:relative;
+            left: 45%;
+            top: 7%;
+            width: 70%;
+            padding: 10px;
+        }
+        .label {
+            position: relative;
+            left: 0%;
+            font-size: 22px;
+            font-weight: bold;
+            color: #000000;
+            text-decoration: underline;
+        }
+        .user-info{
+            font-size: 14px;
+
+            color: #000000;
+        }
+        .profile-pic{
+            position:absolute;
+            width: 40%;
+            top: 0;
+            left: 0;
+        }
+        .white-back{
+            position:relative;
+            background-color: #F6F6F6;
+            border-radius: 10px;
+         
+            
+        }
+        .seperator {
+            width: 90%;
+            display: block;
+            margin: 0 auto;
+            }
+    
+    </style>
+{% endblock %}

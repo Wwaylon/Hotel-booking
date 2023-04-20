@@ -6,15 +6,16 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
-from sqlalchemy import func
+from sqlalchemy import func, or_
 import csv
 from datetime import datetime
 from flask_googlemaps import GoogleMaps, Map
 import requests
 import os
 import math
+import stripe
 basedir = os.path.abspath(os.path.dirname(__file__))
-global prev_sort_option 
+stripe.api_key =  os.environ.get('STRIPE_SECRET_KEY')
 prev_sort_option = ''
 
 
@@ -138,6 +139,8 @@ def home():
         session.pop("check_out", None)
     if "previous_sort_option" in session:
         session.pop("previous_sort_option", None)
+    if "hotel_id" in session:
+        session.pop("hotel_id", None)
     form = HotelSearchForm()
     if form.validate_on_submit():
         #check if checkout date is after checkin date
@@ -317,6 +320,11 @@ def hotel(hotel_id):
 @app.route('/reserve/<room_id>', methods=['GET', 'POST'])
 @login_required
 def reserve(room_id):
+    url =request.referrer
+    url_prefix = url.split('?')[0]
+    if url_prefix != url_for('hotel', hotel_id=session["hotel_id"], _external=True) and request.referrer != url_for('reserve', room_id=room_id, _external=True):
+        flash('You are not allowed to access this page directly. Please reserve a room from the search results page.')
+        return redirect(url_for('home'))
     if "check_in" not in session or "check_out" not in session:
         flash('Please enter a check-in and check-out date. Before reserving a room.')
         return redirect(url_for('sresults'))
@@ -325,18 +333,47 @@ def reserve(room_id):
     form = ReserveRoomForm()
     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
     check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
+
+    # Fetch the room room object from the database based on the room_id
+    room = Room.query.filter_by(id=room_id).first()
+    # Calculate the number of nights the room is reserved for
+    num_nights = (check_out_dt - check_in_dt).days
+    # Calculate the amount based on the price of the room and the number of nights
+    amount = room.pricepn * 100 * num_nights #passed in pricepn object
+    
     if form.validate_on_submit():
         # Code to reserve the room for the given room_id
+        checkout_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': f'Reserved room {room_id} at our hotel',
+                },
+                'unit_amount': amount,
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=request.host_url + 'thank_you',
+        cancel_url=request.host_url + 'cancel_order',
+    )
+        
         reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
         print (reservation_obj.room_id, reservation_obj.check_in, reservation_obj.check_out, reservation_obj.user_id)
         db.session.add(reservation_obj)
         db.session.commit()
-        return redirect(url_for('thank_you'))
+        return redirect(checkout_session.url)
     return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out)
 
 @app.route('/thank_you')
 def thank_you():
     return render_template('thank_you.html')
+
+@app.route('/cancel_order')
+def cancel_order():
+    return render_template('cancel_order.html')
 
 @app.route('/explore')
 @login_required
@@ -379,10 +416,10 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        user = User(username=form.username.data, email=form.email.data, f_name=form.f_name.data, l_name=form.l_name.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -415,7 +452,37 @@ def user(username):
 
     #query user's reservations
     reservations = Reservation.query.filter_by(user_id=current_user.id).all()
-    return render_template('user.html', reservations=reservations, user=user)
+    current_date = datetime.utcnow()
+    res_list = []
+    active_reservations = []
+    past_reservations = []
+    for reservation in reservations:
+        room = Room.query.filter_by(id=reservation.room_id).first()
+        hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+        res_list.append({
+            'hotel_name': hotel.name,
+            'hotel_address': hotel.address,
+            'hotel_city': hotel.city,
+            'hotel_state': hotel.state,
+            'hotel_postal_code': hotel.postal_code,
+            'hotel_country': hotel.country,
+            'check_in': reservation.check_in,
+            'room': room.room_type,
+            'bed': room.bed,
+            'bed_count': room.bed_count,
+            'check_out': reservation.check_out,
+            'img1': hotel.img1
+        })
+        for res in res_list:
+            check_out_date = res['check_out']
+            if check_out_date.date() >= current_date.date():
+                # Reservation is active if check_out date is greater than or equal to current date
+                active_reservations.append(res)
+            else:
+                # Reservation is past if check_out date is less than current date
+                past_reservations.append(res)
+    print (active_reservations)
+    return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations)
   
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
