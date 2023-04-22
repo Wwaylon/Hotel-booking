@@ -83,3 +83,6 @@ class ReserveRoomForm(FlaskForm):
 
 class SeeAvailableRoomsForm(FlaskForm):
     submit = SubmitField('See Available Rooms')
+
+class CancelReservationForm(FlaskForm):
+    submit = SubmitField('Confirm Cancellation')

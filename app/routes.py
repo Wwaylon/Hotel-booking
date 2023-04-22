@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm, CancelReservationForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
 from sqlalchemy import func, or_
@@ -133,14 +133,8 @@ def home():
     #load_room_csv_to_database()NOT NEEDED USE  THE LOAD DATA FUNCTION ABOVE> WAY FASTER
     if "location" in session:
         session.pop("location", None)
-    if "check_in" in session:
-        session.pop("check_in", None)
-    if "check_out" in session:
-        session.pop("check_out", None)
     if "previous_sort_option" in session:
         session.pop("previous_sort_option", None)
-    if "hotel_id" in session:
-        session.pop("hotel_id", None)
     form = HotelSearchForm()
     if form.validate_on_submit():
         #check if checkout date is after checkin date
@@ -188,7 +182,7 @@ def sresults():
     if "hotel_id" in session:
         session.pop("hotel_id", None)
     if "location" not in session:
-        flash('Session data is missing. Please enter search criteria again.')
+        flash('Please enter search criteria again.')
         return redirect(url_for('home'))
     location = session["location"]
     if "check_in" in session and "check_out" in session:
@@ -322,6 +316,8 @@ def hotel(hotel_id):
 def reserve(room_id):
     url =request.referrer
     url_prefix = url.split('?')[0]
+    if url_prefix == url_for('login', _external=True):
+        return redirect(url_for('hotel', hotel_id=session["hotel_id"]))
     if url_prefix != url_for('hotel', hotel_id=session["hotel_id"], _external=True) and request.referrer != url_for('reserve', room_id=room_id, _external=True):
         flash('You are not allowed to access this page directly. Please reserve a room from the search results page.')
         return redirect(url_for('home'))
@@ -361,7 +357,6 @@ def reserve(room_id):
     )
         
         reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
-        print (reservation_obj.room_id, reservation_obj.check_in, reservation_obj.check_out, reservation_obj.user_id)
         db.session.add(reservation_obj)
         db.session.commit()
         return redirect(checkout_session.url)
@@ -392,7 +387,7 @@ def explore():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -460,6 +455,7 @@ def user(username):
         room = Room.query.filter_by(id=reservation.room_id).first()
         hotel = Hotel.query.filter_by(id=room.hotel_id).first()
         res_list.append({
+            'reservation_id': reservation.id,
             'hotel_name': hotel.name,
             'hotel_address': hotel.address,
             'hotel_city': hotel.city,
@@ -481,9 +477,58 @@ def user(username):
             else:
                 # Reservation is past if check_out date is less than current date
                 past_reservations.append(res)
-    print (active_reservations)
-    return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations)
-  
+
+    len_active = len(active_reservations)
+    len_past = len(past_reservations)
+
+    page_active = request.args.get('page_a', 1, type=int)
+    entries_per_page = 4
+    num_pages_active = int(math.ceil(len(active_reservations) / entries_per_page))
+    start_index = (page_active - 1) * entries_per_page
+    end_index = start_index + entries_per_page
+    active_reservations = sorted(active_reservations, key=lambda k: k['check_in'])
+    active_reservations = active_reservations[start_index:end_index]
+
+    page_past = request.args.get('page_p', 1, type=int)
+    num_pages_past = int(math.ceil(len(past_reservations) / entries_per_page))
+    start_index = (page_past - 1) * entries_per_page
+    end_index = start_index + entries_per_page
+    past_reservations = sorted(past_reservations, key=lambda k: k['check_in'])
+    past_reservations = past_reservations[start_index:end_index]
+
+    show = request.args.get('show', 'active', type=str)
+
+    
+    return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations, num_pages_active=num_pages_active, current_page_active=page_active, num_pages_past=num_pages_past, current_page_past=page_past, show=show, len_active=len_active, len_past=len_past)
+
+@app.route('/cancel_reservation/<reservation_id>', methods=['GET', 'POST'])
+@login_required
+def cancel_reservation(reservation_id):
+    form = CancelReservationForm()
+    reservation = Reservation.query.filter_by(id=reservation_id).first()
+    room = Room.query.filter_by(id=reservation.room_id).first()
+    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+    res_info = {
+        'reservation_id': reservation.id,
+        'hotel_name': hotel.name,
+        'hotel_address': hotel.address,
+        'hotel_city': hotel.city,
+        'hotel_state': hotel.state,
+        'hotel_postal_code': hotel.postal_code,
+        'hotel_country': hotel.country,
+        'check_in': datetime(reservation.check_in.year, reservation.check_in.month, reservation.check_in.day, 0, 0, 0),
+        'room': room.room_type,
+        'bed': room.bed,
+        'bed_count': room.bed_count,
+        'check_out': reservation.check_out,
+        'img1': hotel.img1
+    }
+    if form.validate_on_submit():
+        db.session.delete(reservation)
+        db.session.commit()
+        flash('Reservation cancelled')
+        return redirect(url_for('user', username=current_user.username))
+    return render_template('cancel_reservation.html', title='Cancel Reservation', form=form, reservation=res_info)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

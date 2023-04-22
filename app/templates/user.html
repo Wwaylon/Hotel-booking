@@ -42,45 +42,118 @@
     {% endif %}
     {% endwith %}
     <div class="inner-container">
+        <h1 style="text-align: center;"> Your Information </h1>
         <div class="user-info-section">
-            <h1>{{user.username|title}}</h1>
-            <h4>{{user.f_name|title}} {{user.l_name|title}}</h4>
-            <h4>{{user.email}}</h4>
+            <p>Username: {{user.username|title}}</p>
+            <p>Name: {{user.f_name|title}} {{user.l_name|title}}</p>
+            <p>Email: {{user.email}}</p>
         </div>
         <div class="section-divider"> </div>  
         <div class="reservations-section">
-            <h2>Active Reservations</h2>
+            <h2 style="text-align: center;">Reservations</h2>
+            <div class="dropdown">
+                <button class="dropbtn">Showing: {% if show == 'active'%} Active Reservations {% else %} Past Reservations{%endif%}</button>
+                <div class="dropdown-content">
+                    <a href=" {{url_for('user', username=current_user.username, page_a=1, show='active')}}">Active Reservations</a>
+                    <a href=" {{url_for('user', username=current_user.username, page_b=1, show='past')}}">Past Reservations</a>
+                </div>
+            </div> 
+            {% if show == 'active' %}
             {% for reservation in active_reservations %}
             <div class="reservation">
-                <img src="{{ url_for('static', filename= reservation.img1) }}" alt="Img not loaded" class="hotel-image">
                 <div class="reservation-info">
+                    <img src="{{ url_for('static', filename= reservation.img1) }}" alt="Img not loaded" class="hotel-image">
                     <h2>{{ reservation.hotel_name }}</h2>
                     <h3>{{ reservation.room |title}}, {{ reservation.bed_count |title }} {{ reservation.bed |title}}</h3>
                     <p>{{reservation.hotel_address}}, {{reservation.hotel_city}}, {{reservation.hotel_state}} {{reservation.hotel_postal_code}}, {{reservation.hotel_country}}</p>
-                    <p>Check-in Date: {{ reservation.check_in }} </p>
-                    <p>Check-out Date: {{ reservation.check_out }}</p>
+                    <p>Check-in Date: {{ reservation.check_in.strftime('%m/%d/%Y') }} </p>
+                    <p>Check-out Date: {{ reservation.check_out.strftime('%m/%d/%Y') }}</p>
                 </div>
+                <div class="reservation-buttons">
+                    <a href="{{url_for('cancel_reservation', reservation_id=reservation.reservation_id)}}" class="reservation-btn">Cancel Reservation</a>
+                    <a href="#" class="reservation-btn">Edit Reservation</a>
+                </div>  
             </div>
             {% endfor %}
-            <h2>Past Reservations</h2>
+            {% if len_active == 0 %}
+            <br><br>
+            <p style="text-align: center;">You currently have no active reservations.</p>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            {% endif %}
+            {% if num_pages_active == 0 %}
+            {% else %}
+            <nav aria-label="Page navigation" class="page-nav" >
+              <ul class="pagination justify-content-center">
+                <li class="page-item {% if current_page_active == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('user', username=current_user.username, page_a=current_page_active-1) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                {% for page in range(1, num_pages_active + 1) %}
+                <li class="page-item {% if page == current_page_active %}active{% endif %}">
+                    <a class="page-link numbered" href="{{ url_for('user', username=current_user.username, page_a=page) }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if current_page_active == num_pages_active %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('user', username=current_user.username, page_a=current_page_active+1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                    </a>
+                </li>
+              </ul>
+            </nav>
+            {% endif %}
+            {% else %}
             {% for reservation in past_reservations %}
             <div class="reservation">
-                <p>Hotel Name: {{ reservation.hotel_name }}</p>
-                <p>Hotel Address: {{ reservation.hotel_address }}</p>
-                <p>Hotel City: {{ reservation.hotel_city }}</p>
-                <p>Hotel State: {{ reservation.hotel_state }}</p>
-                <p>Hotel Postal Code: {{ reservation.hotel_postal_code }}</p>
-                <p>Hotel Country: {{ reservation.hotel_country }}</p>
-                <p>Check-in Date: {{ reservation.check_in }}</p>
-                <p>Room Type: {{ reservation.room }}</p>
-                <p>Bed Type: {{ reservation.bed }}</p>
-                <p>Bed Count: {{ reservation.bed_count }}</p>
-                <p>Check-out Date: {{ reservation.check_out }}</p>
+                <div class="reservation-info">
+                    <img src="{{ url_for('static', filename= reservation.img1) }}" alt="Img not loaded" class="hotel-image">
+                    <h2>{{ reservation.hotel_name }}</h2>
+                    <h3>{{ reservation.room |title}}, {{ reservation.bed_count |title }} {{ reservation.bed |title}}</h3>
+                    <p>{{reservation.hotel_address}}, {{reservation.hotel_city}}, {{reservation.hotel_state}} {{reservation.hotel_postal_code}}, {{reservation.hotel_country}}</p>
+                    <p>Check-in Date: {{ reservation.check_in.strftime('%m/%d/%Y') }} </p>
+                    <p>Check-out Date: {{ reservation.check_out.strftime('%m/%d/%Y') }}</p>
+                </div>
+                <div class="reservation-buttons">
+                    <a href="#" class="reservation-btn">Leave a Review</a>
+                </div>  
             </div>
             {% endfor %}
-        </div>  
+            {% if len_past == 0 %}
+            <br><br>
+            <p style="text-align: center;">You currently have no past reservations.</p>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            {% endif %}
+            {% if num_pages_past == 0 %}
+            {% else %}
+            <nav aria-label="Page navigation" class="page-nav" >
+              <ul class="pagination justify-content-center">
+                <li class="page-item {% if current_page_past == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('user', username=current_user.username, page_p=current_page_past-1) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                {% for page in range(1, num_pages_past + 1) %}
+                <li class="page-item {% if page == current_page_past %}active{% endif %}">
+                    <a class="page-link numbered" href="{{ url_for('user', username=current_user.username, page_p=page) }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if current_page_past == num_pages_past %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('user', username=current_user.username, page_p=current_page_past+1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                    </a>
+                </li>
+              </ul>
+            </nav>
+            {% endif %}
+        </div> 
+        {% endif %} 
     </div>
     <footer>
+        <div class="section-divider"></div>
         <p>&copy; 2023 LikeHome. All rights reserved.</p>
     </footer>
   </div> <!-- End of .container -->
