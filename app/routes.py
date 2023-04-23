@@ -146,14 +146,13 @@ def home():
         session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
         return redirect(url_for('sresults'))
     
-    if request.method == "GET":
-        #read cities.csv into cities without quotes
-        with open('app/static/cities.csv', 'r') as f:
-            reader = csv.reader(f)
-            cities = list(reader)
-            #remove ' from each entry
-            cities = [x[0].replace("'", "") for x in cities]
-        return render_template('home.html', title='LikeHome - Home', form=form, cities=cities)
+    #read cities.csv into cities without quotes
+    with open('app/static/cities.csv', 'r') as f:
+        reader = csv.reader(f)
+        cities = list(reader)
+        #remove ' from each entry
+        cities = [x[0].replace("'", "") for x in cities]
+    return render_template('home.html', title='LikeHome - Home', form=form, cities=cities)
 
 
 @app.route('/index', methods=['GET', 'POST'])

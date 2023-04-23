@@ -13,6 +13,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  </script>  
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">  </script>  
   <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css" />  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_orange.css">
 </head>
 
 <body>
@@ -55,13 +58,13 @@
                 <div class="item">
                 <p style="display: inline; font-size: 16; margin-bottom: 0px; margin-top:0px; color: rgb(0, 0, 0);"> <b>Check In</b> </p>
                 {{ form.hidden_tag() }}
-                {{ form.check_in(class='dtpick') }}
+                {{ form.check_in(class='datepickerf', placeholder='mm/dd/yyyy') }}
                 </div>
 
                 <div class="item">  
                 <p style="display: inline; font-size: 16; margin-bottom: 0px; margin-top:0px; color: rgb(0, 0, 0);"> <b>Check Out</b> </p>
                 {{ form.hidden_tag() }}
-                {{ form.check_out(class='dtpick') }}
+                {{ form.check_out(class='datepickerf', placeholder='mm/dd/yyyy') }}
                 </div>
 
                 <div class="item">  
@@ -189,6 +192,18 @@
             }
             });
         } );
+    </script>
+    <script>
+        // Initialize Flatpickr
+        flatpickr('.datepickerf', {
+            altInput: true,
+            altFormat: "m/j/Y",
+            dateFormat: "Y-m-d",
+            theme: 'light', // Set the theme to 'light'
+            minDate: 'today', // Set the minimum date to today
+            //set max date to 3 year from today
+            maxDate: new Date().fp_incr(365*2)
+        });
     </script>
   
 
