@@ -15,7 +15,7 @@ import os
 import math
 import stripe
 basedir = os.path.abspath(os.path.dirname(__file__))
-stripe.api_key =  os.environ.get('STRIPE_SECRET_KEY')
+stripe.api_key =  app.config.get('STRIPE_SECRET_KEY')
 prev_sort_option = ''
 
 
@@ -290,8 +290,9 @@ def hotel(hotel_id):
     url = "https://maps.googleapis.com/maps/api/geocode/json"
     params = {
     "address": address,
-    "key": os.environ.get('GMAPS_API')  # Replace with your API key
+    "key": app.config.get('GMAPS_API')  # Replace with your API key
     }
+    print(params)
     response = requests.get(url, params=params)
     data = response.json()
     if data["status"] == "OK":
@@ -305,7 +306,8 @@ def hotel(hotel_id):
             markers=[(lat, lng)]
         )
     else:
-        print("Geocoding failed. Please check your address and API key.")               
+        print("Geocoding failed. Please check your address and API key.")         
+        mymap =None      
     # Code to render the hotel page template with the hotel information
     # ...
     session["hotel_id"] = hotel_id

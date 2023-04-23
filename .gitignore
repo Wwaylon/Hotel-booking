@@ -39,3 +39,4 @@ venv
 app.db
 hotel.log*
 .env
+config.json
