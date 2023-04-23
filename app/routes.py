@@ -231,7 +231,16 @@ def sresults():
         session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
         session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
         return redirect(url_for('sresults', page=1))
-    return render_template('sresults.html', city=city, hotels=hotel_list, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option)
+    
+    if request.method == "GET":
+        #read cities.csv into cities without quotes
+        with open('app/static/cities.csv', 'r') as f:
+            reader = csv.reader(f)
+            cities = list(reader)
+            #remove ' from each entry
+            cities = [x[0].replace("'", "") for x in cities]
+        return render_template('sresults.html', city=city, hotels=hotel_list, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option, cities=cities)
+
 
 @app.route('/hotel/<hotel_id>', methods=['GET', 'POST'])
 def hotel(hotel_id):

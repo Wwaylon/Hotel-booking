@@ -10,6 +10,9 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  </script>  
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">  </script>  
+  <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css" />  
 </head>
 
 <body>
@@ -164,6 +167,23 @@
         <p>&copy; 2023 LikeHome. All rights reserved.</p>
     </footer>
   </div> <!-- End of .container -->
+
+    <script>
+        $( function() {
+            var availableTags = [
+                {% for city in cities %}
+                    "{{city}}",
+                {% endfor %}
+            ];
+            $( "#tags" ).autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                var results = $.ui.autocomplete.filter(availableTags, request.term);
+                response(results.slice(0, 10));
+            }
+            });
+        } );
+    </script>
   
 
 </body>
