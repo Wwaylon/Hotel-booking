@@ -20,3 +20,4 @@ class Config(object):
     GOOGLEMAPS_KEY = config.get('GMAPS_API')
     GMAPS_API = config.get('GMAPS_API')
     ROOMS_PER_PAGE = 10
+    STRIPE_SECRET_KEY = config.get('STRIPE_SECRET_KEY')
