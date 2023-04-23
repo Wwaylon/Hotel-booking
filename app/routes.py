@@ -487,14 +487,14 @@ def user(username):
             'check_out': reservation.check_out,
             'img1': hotel.img1
         })
-        for res in res_list:
-            check_out_date = res['check_out']
-            if check_out_date.date() >= current_date.date():
-                # Reservation is active if check_out date is greater than or equal to current date
-                active_reservations.append(res)
-            else:
-                # Reservation is past if check_out date is less than current date
-                past_reservations.append(res)
+    for res in res_list:
+        check_out_date = res['check_out']
+        if check_out_date.date() >= current_date.date():
+            # Reservation is active if check_out date is greater than or equal to current date
+            active_reservations.append(res)
+        else:
+            # Reservation is past if check_out date is less than current date
+            past_reservations.append(res)
 
     len_active = len(active_reservations)
     len_past = len(past_reservations)
