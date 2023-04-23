@@ -292,7 +292,6 @@ def hotel(hotel_id):
     "address": address,
     "key": app.config.get('GMAPS_API')  # Replace with your API key
     }
-    print(params)
     response = requests.get(url, params=params)
     data = response.json()
     if data["status"] == "OK":
