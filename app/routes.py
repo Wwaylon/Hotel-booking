@@ -331,7 +331,7 @@ def reserve(room_id):
     url_prefix = url.split('?')[0]
     if url_prefix == url_for('login', _external=True):
         return redirect(url_for('hotel', hotel_id=session["hotel_id"]))
-    if url_prefix != url_for('hotel', hotel_id=session["hotel_id"], _external=True) and request.referrer != url_for('reserve', room_id=room_id, _external=True):
+    if url_prefix != url_for('hotel', hotel_id=session["hotel_id"], _external=True) and request.referrer != url_for('reserve', room_id=room_id, _external=True) and  request.referrer != url_for('reserve', room_id=room_id, doublebook=True, _external=True):
         flash('You are not allowed to access this page directly. Please reserve a room from the search results page.')
         return redirect(url_for('home'))
     if "check_in" not in session or "check_out" not in session:

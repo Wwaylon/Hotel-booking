@@ -135,6 +135,19 @@
     <p>&copy; 2023 LikeHome. All rights reserved.</p>
   </footer>
   </div> <!-- End of .container -->
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          // Get current date
+          var currentDate = new Date();
+          // Format current date in YYYY-MM-DD
+          var formattedDate = currentDate.toISOString().split('T')[0];
+          // Set min attribute for Check In and Check Out fields
+          $("input[name='check_in']").attr("min", formattedDate);
+          $("input[name='check_out']").attr("min", formattedDate);
+      });
+  </script>
 </body>
 
 </html>
