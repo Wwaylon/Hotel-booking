@@ -45,13 +45,13 @@ left: 0;
 font-size: 20px;
 font-weight: bold;
 text-decoration: underline;
+text-align: center;
 margin-bottom: 5px;
-}
-.hotel-price{
 }
 .hotel-rating{
 font-size: 18px;
-
+margin-top: 5px;
+margin-bottom: 5px;
 }
 .book-btn{
 background-color: #12bbe11b;
@@ -61,6 +61,14 @@ border-radius: 10px;
 padding: 1px 35px;
 font-size: 20px;
 }
+.price-rating{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 70%;
+}
+
 .inner-container {
     margin-left: 20px;
     margin-right: 20px;

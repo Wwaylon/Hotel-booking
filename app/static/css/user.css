@@ -2,11 +2,6 @@
 margin-left: 20px;
 margin-right: 20px;
 }
-.section-divider {
-margin-top: 20px; /* Adjust margin top as needed */
-margin-bottom: 20px; /* Adjust margin bottom as needed */
-border-top: 1px solid #ccc; /* Set the border style, color, and thickness as desired */
-}
 
 .reservation{
 display: flex;

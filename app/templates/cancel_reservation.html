@@ -42,12 +42,17 @@
     {% endif %}
     {% endwith %}
     <div class="inner-container">
-        <h1>Cancel Reservation</h1>
-        <p>Are you sure you want to cancel your reservation for:</p>
-        <p>{{reservation.hotel_name|title}}</p>
-        <p>From {{ reservation.check_in.strftime('%m/%d/%Y') }} to {{ reservation.check_out.strftime('%m/%d/%Y') }}</p>
-        <p>{{ reservation.room|title }}, {{reservation.bed_count|title}} {{reservation.bed|title}}</p>
-        {{  wtf.quick_form(form)  }}
+        <div style="text-align: center;">
+          <h1>Cancel Reservation</h1>
+          <p>Are you sure you want to cancel your reservation for:</p>
+          <p>{{reservation.hotel_name|title}}</p>
+          <p>From {{ reservation.check_in.strftime('%m/%d/%Y') }} to {{ reservation.check_out.strftime('%m/%d/%Y') }}</p>
+          <p>{{ reservation.room|title }}, {{reservation.bed_count|title}} {{reservation.bed|title}}</p>
+          <form method="post" action="">
+            <input type="hidden" name="{{ form.csrf_token.name }}" value="{{ form.csrf_token._value() }}">
+            {{form.submit(class="cancel-button")}}
+        </form>
+      </div>
     </div>
     <footer>
         <div class="section-divider"></div>

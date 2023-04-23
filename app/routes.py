@@ -153,7 +153,7 @@ def home():
             cities = list(reader)
             #remove ' from each entry
             cities = [x[0].replace("'", "") for x in cities]
-        return render_template('home.html', title='Innkeeper - Home', form=form, cities=cities)
+        return render_template('home.html', title='LikeHome - Home', form=form, cities=cities)
 
 
 @app.route('/index', methods=['GET', 'POST'])
@@ -213,7 +213,10 @@ def sresults():
             sort_option = "hl"
     print(sort_option)
     results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).order_by(Hotel.rating.asc() if sort_option == "lh" else Hotel.rating.desc()).paginate(page=page, per_page=hotels_per_page)
-
+    #query the lowest cost room for each hotel
+    hotel_list = []
+    for hotel in results.items:
+        hotel_list.append((hotel, Room.query.filter_by(hotel_id=hotel.id).order_by(Room.pricepn).first()))
     # Store the current sort option in the session
     session["previous_sort_option"] = sort_option
     print(session["previous_sort_option"])
@@ -228,7 +231,7 @@ def sresults():
         session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
         session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
         return redirect(url_for('sresults', page=1))
-    return render_template('sresults.html', city=city, hotels=results.items, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option)
+    return render_template('sresults.html', city=city, hotels=hotel_list, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option)
 
 @app.route('/hotel/<hotel_id>', methods=['GET', 'POST'])
 def hotel(hotel_id):
@@ -337,7 +340,7 @@ def reserve(room_id):
     num_nights = (check_out_dt - check_in_dt).days
     # Calculate the amount based on the price of the room and the number of nights
     amount = room.pricepn * 100 * num_nights #passed in pricepn object
-    
+    reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
     if form.validate_on_submit():
         # Code to reserve the room for the given room_id
         checkout_session = stripe.checkout.Session.create(
@@ -355,13 +358,27 @@ def reserve(room_id):
         mode='payment',
         success_url=request.host_url + 'thank_you',
         cancel_url=request.host_url + 'cancel_order',
-    )
-        
-        reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
+    )   
         db.session.add(reservation_obj)
         db.session.commit()
         return redirect(checkout_session.url)
-    return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out)
+    res_info = []
+    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+    res_info = {
+        'hotel_name': hotel.name,
+        'hotel_address': hotel.address,
+        'hotel_city': hotel.city,
+        'hotel_state': hotel.state,
+        'hotel_postal_code': hotel.postal_code,
+        'hotel_country': hotel.country,
+        'check_in': reservation_obj.check_in,
+        'room': room.room_type,
+        'bed': room.bed,
+        'bed_count': room.bed_count,
+        'check_out': reservation_obj.check_out,
+        'img1': hotel.img1
+    }
+    return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out, res_info =res_info)
 
 @app.route('/thank_you')
 def thank_you():

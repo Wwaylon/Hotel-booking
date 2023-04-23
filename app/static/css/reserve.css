@@ -1,9 +1,4 @@
-.inner-container {
-margin-left: 20px;
-margin-right: 20px;
-}
-
-.cancel-button{
+.res-button{
 display: inline-block;
 padding: 5px 10px;
 font-size: 16px;
@@ -18,7 +13,7 @@ border-radius: 5px;
 
 }
 
-.cancel-button:hover {
+.res-button:hover {
 background-color: rgb(255, 131, 7);
 color: #fff;
 }
