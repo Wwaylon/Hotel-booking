@@ -342,6 +342,17 @@ def reserve(room_id):
     form = ReserveRoomForm()
     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
     check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
+    #check if double booking
+    doublebook = request.args.get('doublebook', False, type=bool)
+    reservations = Reservation.query.filter_by(user_id=current_user.id).all()
+    print (reservations)
+    if doublebook == False:
+        for reservation in reservations:
+            #check if there is overlap
+            if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
+                flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Are you sure you wish to double book? Note that no refunds will be given for double booking.')
+                return redirect(url_for('reserve', room_id=room_id, doublebook=True))
+
 
     # Fetch the room room object from the database based on the room_id
     room = Room.query.filter_by(id=room_id).first()
