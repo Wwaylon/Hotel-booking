@@ -369,11 +369,11 @@ def reserve(room_id):
     #hotel_info = Hotel.query.filter_by(id=hotel_id).first()
     num_nights = (check_out_dt - check_in_dt).days
     if current_user.reward_points >= 100 and form.reward_point_discount.data == True:
-        amount = (room.pricepn * num_nights * 100 * (.90))
+        amount = int(room.pricepn * num_nights * 100 * (.90))
         amount_proper= room.pricepn * num_nights * (.90)
         name = f'10% off(reward points) {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
     else: 
-        amount = room.pricepn * num_nights  * 100
+        amount = int(room.pricepn * num_nights  * 100)
         amount_proper= room.pricepn * num_nights 
         name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
 
