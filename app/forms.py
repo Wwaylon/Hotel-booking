@@ -79,6 +79,7 @@ class ResetPasswordForm(FlaskForm):
     submit = SubmitField('Request Password Reset')
 
 class ReserveRoomForm(FlaskForm):
+    reward_point_discount = BooleanField('Redeem 100 points for 10% of your next reservation', validators=[Optional()])
     reserve = SubmitField('Reserve')
 
 class SeeAvailableRoomsForm(FlaskForm):
@@ -86,3 +87,7 @@ class SeeAvailableRoomsForm(FlaskForm):
 
 class CancelReservationForm(FlaskForm):
     submit = SubmitField('Confirm Cancellation')
+
+class RedeemPointsForm(FlaskForm):
+    redeem = BooleanField('Redeem 100 points for a free night stay', validators=[DataRequired(message='You must check this box to confirm redemption.')])
+    submit = SubmitField('Redeem Points')

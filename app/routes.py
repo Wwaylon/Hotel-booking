@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm, CancelReservationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm, CancelReservationForm, RedeemPointsForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
 from sqlalchemy import func, or_
@@ -344,7 +344,6 @@ def reserve(room_id):
     #check if double booking
     doublebook = request.args.get('doublebook', False, type=bool)
     reservations = Reservation.query.filter_by(user_id=current_user.id).all()
-    print (reservations)
     if doublebook == False:
         for reservation in reservations:
             #check if there is overlap
@@ -353,13 +352,31 @@ def reserve(room_id):
                 return redirect(url_for('reserve', room_id=room_id, doublebook=True))
 
 
+    #-->Added checkin and checkout date range check
+    if check_in_dt.date() < datetime.now().date() or check_out_dt.date() < datetime.now().date():
+        flash('Please select a check-in and check-out date in the future.')
+        return redirect(url_for('sresults'))
+    if check_in_dt.date() == check_out_dt.date():
+        flash('Check-out date must be after check-in date')
+        return redirect(url_for('sresults'))
+
     # Fetch the room room object from the database based on the room_id
     room = Room.query.filter_by(id=room_id).first()
-    # Calculate the number of nights the room is reserved for
+
+    #-->Added
+    hotel_id = room.hotel_id
+    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+    #hotel_info = Hotel.query.filter_by(id=hotel_id).first()
     num_nights = (check_out_dt - check_in_dt).days
-    # Calculate the amount based on the price of the room and the number of nights
-    amount = room.pricepn * 100 * num_nights #passed in pricepn object
-    reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
+    if current_user.reward_points >= 100 and form.reward_point_discount.data == True:
+        amount = (room.pricepn * num_nights * 100 * (.90))
+        amount_proper= room.pricepn * num_nights * (.90)
+        name = f'10% off(reward points) {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
+    else: 
+        amount = room.pricepn * num_nights  * 100
+        amount_proper= room.pricepn * num_nights 
+        name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
+
     if form.validate_on_submit():
         # Code to reserve the room for the given room_id
         checkout_session = stripe.checkout.Session.create(
@@ -368,7 +385,8 @@ def reserve(room_id):
             'price_data': {
                 'currency': 'usd',
                 'product_data': {
-                    'name': f'Reserved room {room_id} at our hotel',
+					#-->Added
+                    'name': name,
                 },
                 'unit_amount': amount,
             },
@@ -377,12 +395,32 @@ def reserve(room_id):
         mode='payment',
         success_url=request.host_url + 'thank_you',
         cancel_url=request.host_url + 'cancel_order',
-    )   
+    )
+        
+        reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
         db.session.add(reservation_obj)
+        
+        #-->Added reward points to the user
+        if form.reward_point_discount.data == True:
+            current_user.reward_points = 0
+        else:
+            reward_points_per_night = 5  
+            if (current_user.reward_points + (num_nights * reward_points_per_night)) > 100:
+                current_user.reward_points = 100
+            else:
+                current_user.reward_points += num_nights * reward_points_per_night
+            
         db.session.commit()
         return redirect(checkout_session.url)
+    
+    redeemable = False
+    if current_user.reward_points >= 100:
+        redeemable = True
+
+    reward_points_per_night = 5  
+    potential_reward_points = (num_nights * reward_points_per_night)
+
     res_info = []
-    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
     res_info = {
         'hotel_name': hotel.name,
         'hotel_address': hotel.address,
@@ -390,14 +428,14 @@ def reserve(room_id):
         'hotel_state': hotel.state,
         'hotel_postal_code': hotel.postal_code,
         'hotel_country': hotel.country,
-        'check_in': reservation_obj.check_in,
+        'check_in': check_in_dt.date(),
         'room': room.room_type,
         'bed': room.bed,
         'bed_count': room.bed_count,
-        'check_out': reservation_obj.check_out,
+        'check_out': check_out_dt.date(),
         'img1': hotel.img1
     }
-    return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out, res_info =res_info)
+    return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out, res_info =res_info, redeemable=redeemable, potential_reward_points= potential_reward_points, cost=amount_proper)
 
 @app.route('/thank_you')
 def thank_you():
@@ -474,7 +512,7 @@ def user(username):
     return render_template('user.html', user=user, posts=posts.items,
                            next_url=next_url, prev_url=prev_url, form=form)
 """
-@app.route('/user/<username>')
+@app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -536,7 +574,7 @@ def user(username):
     show = request.args.get('show', 'active', type=str)
 
     
-    return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations, num_pages_active=num_pages_active, current_page_active=page_active, num_pages_past=num_pages_past, current_page_past=page_past, show=show, len_active=len_active, len_past=len_past)
+    return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations, num_pages_active=num_pages_active, current_page_active=page_active, num_pages_past=num_pages_past, current_page_past=page_past, show=show, len_active=len_active, len_past=len_past, reward_points=current_user.reward_points)
 
 @app.route('/cancel_reservation/<reservation_id>', methods=['GET', 'POST'])
 @login_required
@@ -561,7 +599,15 @@ def cancel_reservation(reservation_id):
         'img1': hotel.img1
     }
     if form.validate_on_submit():
+         #-->Calculate the number of nights for the reservation
+        num_nights = (reservation.check_out - reservation.check_in).days
         db.session.delete(reservation)
+        
+        #-->Deduct reward points from the user
+        reward_points_per_night = 5  # You can change this value as needed
+        current_user.reward_points = max(current_user.reward_points - (num_nights * reward_points_per_night), 0)
+
+        
         db.session.commit()
         flash('Reservation cancelled')
         return redirect(url_for('user', username=current_user.username))

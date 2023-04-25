@@ -50,8 +50,13 @@
             <p>{{res_info.hotel_address}}, {{res_info.hotel_city}}, {{res_info.hotel_state}} {{res_info.hotel_postal_code}}, {{res_info.hotel_country}}</p>
             <p>From {{ res_info.check_in.strftime('%m/%d/%Y') }} to {{ res_info.check_out.strftime('%m/%d/%Y') }}</p>
             <p>{{ res_info.room|title }}, {{res_info.bed_count|title}} {{res_info.bed|title}}</p>
+            <p>Cost: ${{cost}}</p>
+            <p>Reward points to be earned on this reservation: {{potential_reward_points}}</p>
             <form method="post" action="">
                 <input type="hidden" name="{{ form.csrf_token.name }}" value="{{ form.csrf_token._value() }}">
+                {% if  redeemable == True %}
+                <p>{{form.reward_point_discount()}} Apply reward points(100pts) for 10% off?</p> 
+                {% endif %}
                 {{form.reserve(class="res-button")}}
             </form>
         </div>
