@@ -418,7 +418,7 @@ def reserve(room_id):
         redeemable = True
 
     reward_points_per_night = 5  
-    potential_reward_points = (num_nights * reward_points_per_night)
+    potential_reward_points = min(100, (num_nights * reward_points_per_night))
 
     res_info = []
     res_info = {
