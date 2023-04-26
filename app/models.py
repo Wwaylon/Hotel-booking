@@ -136,4 +136,4 @@ class Reservation(db.Model):
     check_in = db.Column(db.DateTime)
     check_out = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    payment_method = db.Column(db.String(255))
+    checkout_session = db.Column(db.String(255))
