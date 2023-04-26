@@ -55,7 +55,7 @@
             <form method="post" action="">
                 <input type="hidden" name="{{ form.csrf_token.name }}" value="{{ form.csrf_token._value() }}">
                 {% if  redeemable == True %}
-                <p>{{form.reward_point_discount()}} Apply reward points(100pts) for 10% off?</p> 
+                <p>{{form.reward_point_discount()}} Apply reward points(100pts) for 1 night free?</p> 
                 {% endif %}
                 {{form.reserve(class="res-button")}}
             </form>

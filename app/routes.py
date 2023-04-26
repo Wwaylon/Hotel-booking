@@ -342,14 +342,14 @@ def reserve(room_id):
     check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
     check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
     #check if double booking
-    doublebook = request.args.get('doublebook', False, type=bool)
+    room = Room.query.filter_by(id=room_id).first()
     reservations = Reservation.query.filter_by(user_id=current_user.id).all()
-    if doublebook == False:
-        for reservation in reservations:
-            #check if there is overlap
-            if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
-                flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Are you sure you wish to double book? Note that no refunds will be given for double booking.')
-                return redirect(url_for('reserve', room_id=room_id, doublebook=True))
+    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+    for reservation in reservations:
+        #check if there is overlap
+        if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
+            flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
+            return redirect(url_for('hotel', hotel_id=hotel.id))
 
 
     #-->Added checkin and checkout date range check
@@ -360,25 +360,19 @@ def reserve(room_id):
         flash('Check-out date must be after check-in date')
         return redirect(url_for('sresults'))
 
-    # Fetch the room room object from the database based on the room_id
-    room = Room.query.filter_by(id=room_id).first()
-
-    #-->Added
-    hotel_id = room.hotel_id
-    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
     #hotel_info = Hotel.query.filter_by(id=hotel_id).first()
     num_nights = (check_out_dt - check_in_dt).days
     if current_user.reward_points >= 100 and form.reward_point_discount.data == True:
-        amount = int(room.pricepn * num_nights * 100 * (.90))
-        amount_proper= room.pricepn * num_nights * (.90)
-        name = f'10% off(reward points) {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
+        amount = int(room.pricepn * (num_nights-1) * 100)
+        amount_proper= room.pricepn * num_nights-1
+        name = f'1 Night Free: {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id}'
     else: 
         amount = int(room.pricepn * num_nights  * 100)
         amount_proper= room.pricepn * num_nights 
-        name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()}'
+        name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id}'
 
-    if form.validate_on_submit():
-        # Code to reserve the room for the given room_id
+    if form.validate_on_submit(): 
+        cust= stripe.Customer.create()       
         checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[{
@@ -392,24 +386,14 @@ def reserve(room_id):
             },
             'quantity': 1,
         }],
+        payment_intent_data= {
+            'setup_future_usage': 'off_session'
+        },
         mode='payment',
+        customer = cust.id,
         success_url=request.host_url + 'thank_you',
         cancel_url=request.host_url + 'cancel_order',
-    )
-        
-        reservation_obj = Reservation(room_id=room_id, check_in=check_in_dt, check_out=check_out_dt, user_id=current_user.id)
-        db.session.add(reservation_obj)
-        
-        #-->Added reward points to the user
-        if form.reward_point_discount.data == True:
-            current_user.reward_points = 0
-        else:
-            reward_points_per_night = 5  
-            if (current_user.reward_points + (num_nights * reward_points_per_night)) > 100:
-                current_user.reward_points = 100
-            else:
-                current_user.reward_points += num_nights * reward_points_per_night
-            
+    )       
         db.session.commit()
         return redirect(checkout_session.url)
     
@@ -598,7 +582,15 @@ def cancel_reservation(reservation_id):
         'check_out': reservation.check_out,
         'img1': hotel.img1
     }
+    session = stripe.checkout.Session.retrieve(reservation.checkout_session, expand=['payment_intent'])
+    payment_method = session.payment_intent.payment_method
+    customer_id = session.customer
+    stripe.PaymentMethod.attach(payment_method, customer=customer_id)
+
+
     if form.validate_on_submit():
+        payment = stripe.PaymentIntent.create(customer=customer_id, payment_method=payment_method, amount=50*100, currency='usd', payment_method_types=['card'], confirm=True)
+        refund = stripe.Refund.create(charge=session.payment_intent.latest_charge)
          #-->Calculate the number of nights for the reservation
         num_nights = (reservation.check_out - reservation.check_in).days
         db.session.delete(reservation)
@@ -713,3 +705,53 @@ def submit(city):
         return redirect(url_for('sresults'))
     else :
         return redirect(url_for('home'))
+    
+
+@app.route('/event', methods=['POST'])
+def new_event():
+    event = None
+    payload = request.data
+    signature = request.headers['STRIPE_SIGNATURE']
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, signature, app.config.get('STRIPE_WEBHOOK_SECRET'))
+    except Exception as e:
+        # the payload could not be verified
+        abort(400)
+
+    if event['type'] == 'checkout.session.completed':
+        session = stripe.checkout.Session.retrieve(
+            event['data']['object'].id, expand=['line_items'])
+        print(f'Sale to {session.customer_details.email}:')
+        for item in session.line_items.data:
+            print(f'  - {item.quantity} {item.description} '
+                    f'${item.amount_total/100:.02f} {item.currency.upper()}')
+        #from the item.description get the room id and the check in and check out dates and current user id
+        #create a reservation object and save it to the database
+            description_parts = item.description.split(" - ")
+            desc = description_parts[0]
+            check_in = description_parts[3]
+            check_out = description_parts[4]
+            user_id = int(description_parts[5])
+            room_id = int(description_parts[6])
+            print (check_in, check_out, user_id, room_id)
+        payment_intent = event["data"]["object"]["payment_intent"]
+        print(event["data"]["object"])
+        #if  desc has the word '1 night free' in it, then add 1 night to the reservation
+        check_in =  datetime.strptime(check_in, "%Y-%m-%d")
+        check_out =  datetime.strptime(check_out, "%Y-%m-%d")
+        num_nights = (check_out - check_in).days
+        user = User.query.filter_by(id=user_id).first()
+        if (user.reward_points + min(num_nights * 5, 100)) > 100:
+            user.reward_points = 100
+        else:
+            user.reward_points += min(num_nights * 5, 100)
+        if '1 Night Free' in desc:
+            user.reward_points = 0    
+        reservation = Reservation(check_in=check_in, check_out=check_out, user_id=user_id, room_id=room_id, checkout_session=event['data']['object'].id)
+        db.session.add(reservation)
+        db.session.commit()
+
+
+    return {'success': True}

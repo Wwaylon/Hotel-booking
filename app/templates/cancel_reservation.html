@@ -48,6 +48,7 @@
           <p>{{reservation.hotel_name|title}}</p>
           <p>From {{ reservation.check_in.strftime('%m/%d/%Y') }} to {{ reservation.check_out.strftime('%m/%d/%Y') }}</p>
           <p>{{ reservation.room|title }}, {{reservation.bed_count|title}} {{reservation.bed|title}}</p>
+          <P>Note that while you may be refunded, you will be charged a $50 cancellation fee</P>
           <form method="post" action="">
             <input type="hidden" name="{{ form.csrf_token.name }}" value="{{ form.csrf_token._value() }}">
             {{form.submit(class="cancel-button")}}

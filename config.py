@@ -21,3 +21,4 @@ class Config(object):
     GMAPS_API = config.get('GMAPS_API')
     ROOMS_PER_PAGE = 10
     STRIPE_SECRET_KEY = config.get('STRIPE_SECRET_KEY')
+    STRIPE_WEBHOOK_SECRET = config.get('STRIPE_WEBHOOK_SECRET')
