@@ -72,7 +72,7 @@
                 </div>
                 <div class="reservation-buttons">
                     <a href="{{url_for('cancel_reservation', reservation_id=reservation.reservation_id)}}" class="reservation-btn">Cancel Reservation</a>
-                    <a href="#" class="reservation-btn">Edit Reservation</a>
+                    <a href="{{url_for('load_session', reservation_id=reservation.reservation_id)}}" class="reservation-btn">Edit Reservation</a>
                 </div>  
             </div>
             {% endfor %}

@@ -365,11 +365,11 @@ def reserve(room_id):
     if current_user.reward_points >= 100 and form.reward_point_discount.data == True:
         amount = int(room.pricepn * (num_nights-1) * 100)
         amount_proper= room.pricepn * num_nights-1
-        name = f'1 Night Free: {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id}'
+        name = f'1 Night Free: {hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id} - f - 0'
     else: 
         amount = int(room.pricepn * num_nights  * 100)
         amount_proper= room.pricepn * num_nights 
-        name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id}'
+        name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id} - f - 0'
 
     if form.validate_on_submit(): 
         cust= stripe.Customer.create()       
@@ -421,6 +421,100 @@ def reserve(room_id):
     }
     return render_template('reserve.html', form=form, check_in=check_in, check_out=check_out, res_info =res_info, redeemable=redeemable, potential_reward_points= potential_reward_points, cost=amount_proper)
 
+@app.route('/edit_reservation_reserve/<room_id>/<reservation_id>', methods=['GET', 'POST'])
+@login_required
+def edit_reservation_reserve(room_id, reservation_id):
+    url =request.referrer
+    url_prefix = url.split('?')[0]
+    if url_prefix == url_for('login', _external=True):
+        return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+    if url_prefix != url_for('edit_reservation', reservation_id=reservation_id, _external=True) and request.referrer != url_for('edit_reservation_reserve', room_id=room_id, reservation_id=reservation_id, _external=True) and  request.referrer != url_for('edit_reservation_reserve', room_id=room_id, reservation_id=reservation_id, doublebook=True, _external=True):
+        flash('You are not allowed to access this page directly. Please reserve a room from the search results page.')
+        return redirect(url_for('home'))
+    if "check_in" not in session or "check_out" not in session:
+        flash('Please enter a check-in and check-out date. Before reserving a room.')
+        return redirect(url_for('home'))
+    check_in = session["check_in"]
+    check_out = session["check_out"]
+    form = ReserveRoomForm()
+    check_in_dt = datetime.strptime(check_in, '%Y-%m-%d')
+    check_out_dt = datetime.strptime(check_out, '%Y-%m-%d')
+    #check if double booking
+    room = Room.query.filter_by(id=room_id).first()
+    reservations = Reservation.query.filter_by(user_id=current_user.id).all()
+    hotel = Hotel.query.filter_by(id=room.hotel_id).first()
+    for reservation in reservations:
+        #check if there is overlap
+        if reservation.id == int(reservation_id):
+            reservations.remove(reservation)
+            continue
+        if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
+            flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
+            return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+
+
+    #-->Added checkin and checkout date range check
+    if check_in_dt.date() < datetime.now().date() or check_out_dt.date() < datetime.now().date():
+        flash('Please select a check-in and check-out date in the future.')
+        return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+    if check_in_dt.date() == check_out_dt.date():
+        flash('Check-out date must be after check-in date')
+        return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+
+    #hotel_info = Hotel.query.filter_by(id=hotel_id).first()
+    num_nights = (check_out_dt - check_in_dt).days
+    amount = int(room.pricepn * num_nights  * 100)
+    amount_proper= room.pricepn * num_nights 
+    name = f'{hotel.name} - {room.room_type.capitalize()} - {room.bed_count} {room.bed.capitalize()} - {check_in_dt.date()} - {check_out_dt.date()} - {current_user.id} - {room.id} - t - {reservation_id}'
+
+    if form.validate_on_submit(): 
+        cust= stripe.Customer.create()       
+        checkout_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+					#-->Added
+                    'name': name,
+                },
+                'unit_amount': amount,
+            },
+            'quantity': 1,
+        }],
+        payment_intent_data= {
+            'setup_future_usage': 'off_session'
+        },
+        mode='payment',
+        customer = cust.id,
+        success_url=request.host_url + 'thank_you',
+        cancel_url=request.host_url + 'cancel_order',
+    )       
+        db.session.commit()
+        return redirect(checkout_session.url)
+    
+    redeemable = False
+
+    reward_points_per_night = 5  
+    potential_reward_points = min(100, (num_nights * reward_points_per_night))
+
+    res_info = []
+    res_info = {
+        'hotel_name': hotel.name,
+        'hotel_address': hotel.address,
+        'hotel_city': hotel.city,
+        'hotel_state': hotel.state,
+        'hotel_postal_code': hotel.postal_code,
+        'hotel_country': hotel.country,
+        'check_in': check_in_dt.date(),
+        'room': room.room_type,
+        'bed': room.bed,
+        'bed_count': room.bed_count,
+        'check_out': check_out_dt.date(),
+        'img1': hotel.img1
+    }
+    return render_template('edit_reservation_reserve.html', form=form, check_in=check_in, check_out=check_out, res_info =res_info, redeemable=redeemable, potential_reward_points= potential_reward_points, cost=amount_proper, reservation_id=reservation_id)
+
 @app.route('/thank_you')
 def thank_you():
     return render_template('thank_you.html')
@@ -449,9 +543,9 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Invalid email or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -559,6 +653,99 @@ def user(username):
 
     
     return render_template('user.html', user=user, active_reservations=active_reservations, past_reservations=past_reservations, num_pages_active=num_pages_active, current_page_active=page_active, num_pages_past=num_pages_past, current_page_past=page_past, show=show, len_active=len_active, len_past=len_past, reward_points=current_user.reward_points)
+
+@app.route('/load_session/<reservation_id>', methods=['GET', 'POST'])
+@login_required
+def load_session(reservation_id):
+    reservation = Reservation.query.filter_by(id=reservation_id).first()
+    session["check_in"] = reservation.check_in.strftime('%Y-%m-%d')
+    session["check_out"] = reservation.check_out.strftime('%Y-%m-%d')
+    return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+
+@app.route('/edit_reservation/<reservation_id>', methods=['GET', 'POST'])
+@login_required
+def edit_reservation(reservation_id):
+    #query reservation
+    reservation = Reservation.query.filter_by(id=reservation_id).first()
+    room = Room.query.filter_by(id=reservation.room_id).first()
+    hotel_id = room.hotel_id
+    check_in_dt = datetime.strptime(session["check_in"], '%Y-%m-%d')
+    check_out_dt = datetime.strptime(session["check_out"], '%Y-%m-%d')
+    form = CheckInCheckOutForm(check_in=check_in_dt, check_out=check_out_dt)
+    if form.validate_on_submit():
+        if form.check_out.data < form.check_in.data:
+            flash('Check-out date must be after check-in date')
+            return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+        session["check_in"] = form.check_in.data.strftime('%Y-%m-%d')
+        session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
+        return redirect(url_for('edit_reservation', reservation_id=reservation_id))
+
+
+    # Code to fetch hotel information for the given hotel_id
+    hotel_info = Hotel.query.filter_by(id=hotel_id).first()
+    #find the rooms for the hotel
+    rooms = Room.query.filter_by(hotel_id=hotel_id).all()
+    #find the reservations the overlap with the checkin and checkout dates
+    reservations = Reservation.query.filter(Reservation.room_id.in_([room.id for room in rooms])).all()
+    #remove the rooms that are reserved during the checkin and checkout dates
+    for reservation in reservations:
+        if reservation.check_in <= check_in_dt <= reservation.check_out or reservation.check_in <= check_out_dt <= reservation.check_out:
+            #find the room that is reserved and remove it from the list of rooms
+            for room in rooms:
+                if room.id == reservation.room_id:
+                    rooms.remove(room)
+    global prev_sort_option
+    sort_option = request.args.get('sort')
+    page = request.args.get('page', 1, type=int)
+    if sort_option != prev_sort_option and sort_option is not None:
+        page = 1
+    else: 
+        sort_option = prev_sort_option
+    if sort_option == 'lh':
+        rooms.sort(key=lambda x: x.pricepn)
+    elif sort_option == 'hl':
+        rooms.sort(key=lambda x: x.pricepn, reverse=True)
+    else:
+        sort_option = prev_sort_option
+        if sort_option == 'lh':
+            rooms.sort(key=lambda x: x.pricepn)
+        elif sort_option == 'hl':
+            rooms.sort(key=lambda x: x.pricepn, reverse=True)
+    prev_sort_option = sort_option
+
+    rooms_per_page = 10
+    num_pages = int(math.ceil(len(rooms) / rooms_per_page))
+    start_index = (page - 1) * rooms_per_page
+    end_index = start_index + rooms_per_page
+    rooms = rooms[start_index:end_index]
+
+    #append address, city, state, postal code, and country to address
+    address = hotel_info.address + ', ' + hotel_info.city + ', ' + hotel_info.state + ', ' + str(hotel_info.postal_code) + ', ' + hotel_info.country
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+    "address": address,
+    "key": app.config.get('GMAPS_API')  # Replace with your API key
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    if data["status"] == "OK":
+        result = data["results"][0]
+        lat = result["geometry"]["location"]["lat"]
+        lng = result["geometry"]["location"]["lng"]
+        mymap = Map(
+            identifier="view-side",
+            lat=lat,
+            lng=lng,
+            markers=[(lat, lng)]
+        )
+    else:
+        print("Geocoding failed. Please check your address and API key.")         
+        mymap =None      
+    # Code to render the hotel page template with the hotel information
+    # ...
+    session["hotel_id"] = hotel_id
+    return render_template('edit_reservation.html', hotel_info=hotel_info, rooms=rooms, form=form, mymap = mymap, num_pages=num_pages, current_page=page, sort_option=sort_option, reservation_id=reservation_id, current_reservation_room_id=reservation.room_id)
+
 
 @app.route('/cancel_reservation/<reservation_id>', methods=['GET', 'POST'])
 @login_required
@@ -735,23 +922,32 @@ def new_event():
             check_out = description_parts[4]
             user_id = int(description_parts[5])
             room_id = int(description_parts[6])
-            print (check_in, check_out, user_id, room_id)
+            edit_reservation_flag= description_parts[7]
+            old_reservation = description_parts[8]
         payment_intent = event["data"]["object"]["payment_intent"]
-        print(event["data"]["object"])
         #if  desc has the word '1 night free' in it, then add 1 night to the reservation
         check_in =  datetime.strptime(check_in, "%Y-%m-%d")
         check_out =  datetime.strptime(check_out, "%Y-%m-%d")
         num_nights = (check_out - check_in).days
         user = User.query.filter_by(id=user_id).first()
-        if (user.reward_points + min(num_nights * 5, 100)) > 100:
-            user.reward_points = 100
-        else:
-            user.reward_points += min(num_nights * 5, 100)
-        if '1 Night Free' in desc:
-            user.reward_points = 0    
+        if edit_reservation_flag == 'f':
+            if (user.reward_points + min(num_nights * 5, 100)) > 100:
+                user.reward_points = 100
+            else:
+                user.reward_points += min(num_nights * 5, 100)
+            if '1 Night Free' in desc:
+                user.reward_points = 0    
+        elif edit_reservation_flag == 't':
+            #delete the old reservation
+            old_reservation = Reservation.query.filter_by(id=old_reservation).first()
+            #refund the user
+            session = stripe.checkout.Session.retrieve(old_reservation.checkout_session, expand=['payment_intent'])
+            payment_method = session.payment_intent.payment_method
+            customer_id = session.customer
+            stripe.PaymentMethod.attach(payment_method, customer=customer_id)
+            refund = stripe.Refund.create(charge=session.payment_intent.latest_charge)
+            db.session.delete(old_reservation)
         reservation = Reservation(check_in=check_in, check_out=check_out, user_id=user_id, room_id=room_id, checkout_session=event['data']['object'].id)
         db.session.add(reservation)
         db.session.commit()
-
-
     return {'success': True}

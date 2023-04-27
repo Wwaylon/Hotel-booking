@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/hotel.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  {{mymap.js}}
+</head>
+
+<body>
+    <header>
+        <div class="navigation">
+            <a href="{{url_for('home')}}" id="website-name">Like<span style="color: rgb(255, 255, 0)">Home</span>
+                <svg class="website-logo" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></a>
+            <nav>
+                <ul>
+                <li><a href="{{url_for('home')}}">Home</a></li>
+                <li><a href="#">About</a></li>
+                {% if current_user.is_anonymous %}
+                  <li><a href="{{url_for('login')}}">Login</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                  <li><a href="{{url_for('logout')}}">Logout</a></li>
+                {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header> 
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="flash" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class ="grid_container"> 
+        <form method="post" action="">
+            <div class ="form_grid">
+                <div class="item">
+                <p style="display: inline; font-size: 16; margin-bottom: 0px; margin-top:0px; color: rgb(0, 0, 0);"> <b>Check In</b> </p>
+                {{ form.hidden_tag() }}
+                {{ form.check_in(class='dtpick') }}
+                </div>
+
+                <div class="item">  
+                <p style="display: inline; font-size: 16; margin-bottom: 0px; margin-top:0px; color: rgb(0, 0, 0);"> <b>Check Out</b> </p>
+                {{ form.hidden_tag() }}
+                {{ form.check_out(class='dtpick') }}
+                </div>
+
+                <div class="item">  
+                <p style="display: inline; font-size: 20; margin-bottom: 0px; margin-top:0px;"> &#8205; </p>
+                {{form.submit(class='button')}}
+                </div>  
+
+            </div>
+        </form>
+    </div>
+    <div class="inner-container">
+        <div class="hotel-info">
+            <div class="info-main">
+                <h1>{{hotel_info.name}}</h1>
+                {% set rating = hotel_info.rating %}
+                {% for i in range(1, 6) %}
+                    {% if rating >= i %}
+                        <i class="fa fa-star checked"></i>
+                    {% elif (rating + 0.5) >= i %}
+                        <i class="fa fa-star-half-o checked"></i>
+                    {% else %}
+                        <i class="fa fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <i>- {{hotel_info.rating}}&#9733;</i>
+                <p>{{hotel_info.address}}, {{hotel_info.city}}, {{hotel_info.state}} {{hotel_info.postal_code}}, {{hotel_info.country}}</p>
+                <p>Phone Number: {{hotel_info.phone}}</p>
+                <p>Email: {{hotel_info.email}}</p>
+                <a href="http://{{hotel_info.website}}" class="website-btn">Visit Website</a>
+            </div>
+            <div class="google-maps">
+                {{mymap.html}}
+            </div>  
+        </div>
+        <div class="section-divider"></div>  
+        <div class="rooms-section">
+            <h2>Select An Available Rooms</h2><a href="{{ url_for('edit_reservation_reserve', room_id=current_reservation_room_id, reservation_id=reservation_id) }}" class="book-btn">Continue With Your Already Reserved Room</a>
+            <nav aria-label="Page navigation" class="page-nav">
+                <div class="dropdown">
+                    <button class="dropbtn">Sort By: Price -{% if sort_option == 'hl'%} High to Low {% else %} Low to High{%endif%}</button>
+                    <div class="dropdown-content">
+                        <a href=" {{url_for('edit_reservation', reservation_id=reservation_id, page=current_page, sort='lh')}}">Price - Low to High</a>
+                        <a href=" {{url_for('edit_reservation', reservation_id=reservation_id, page=current_page, sort='hl')}}">Price - High to Low</a>
+                    </div>
+                </div> 
+                <ul class="pagination justify-content-center">
+                <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=current_page-1) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                {% for page in range(1, num_pages + 1) %}
+                <li class="page-item {% if page == current_page %}active{% endif %}">
+                    <a class="page-link numbered" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=page) }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=current_page+1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                    </a>
+                </li>
+                </ul>
+            </nav>
+            <div class="room-list">
+                {% for room in rooms %}
+                <div class="room-item">
+                    {% if room.room_type == "room" %}
+                        <img src="{{ url_for('static', filename='room.jpg') }}" alt="room image">
+                    {% elif room.room_type == "Suite" %}
+                        <img src="{{ url_for('static', filename='suite.jpg') }}" alt="room image">
+                    {% elif room.room_type == "Deluxe Room" %}
+                        <img src="{{ url_for('static', filename='deluxeroom.jpg') }}" alt="room image">
+                    {% endif %}
+                    <div class="room-info">
+                        <h4>{{ room.room_type|title }}, {{room.bed_count|title}} {{room.bed|title}}</h4>
+                        <p>${{ room.pricepn }} Per Night</p>
+                        <p>Sleeps: {{room.bed_count * 2}}</p>
+                        <a href="{{ url_for('edit_reservation_reserve', room_id=room.id, reservation_id=reservation_id) }}" class="book-btn" value="{{room.id}}">Book</a>
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+        </div>
+
+                <!-- Pagination section -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+            <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=current_page-1) }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            {% for page in range(1, num_pages + 1) %}
+            <li class="page-item {% if page == current_page %}active{% endif %}">
+                <a class="page-link numbered" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=page) }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('edit_reservation', reservation_id=reservation_id, page=current_page+1) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+                </a>
+            </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="section-divider"></div>
+    <footer>
+        <p>&copy; 2023 LikeHome. All rights reserved.</p>
+    </footer>
+  </div> <!-- End of .container -->
+  
+
+</body>
+
+</html>
