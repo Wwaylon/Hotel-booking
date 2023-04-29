@@ -227,4 +227,81 @@
     }
 
 
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1; 
+      padding-top: 100px; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgb(0,0,0); 
+      background-color: rgba(0,0,0,0.4); 
+      }
+      
+      .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 500px;
+      }
+      
+      .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      }
+      
+      .close:hover,
+      .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+      }
+      
+      .filter_btn{
+      background-color: transparent;
+      font-size: 16px;
+      padding: 10px 20px;
+      border:  1px solid #000;
+      text-decoration: none;
+      color : #000;
+      cursor:pointer;
+      }
+      
+      .filter-amentiies{
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          justify-content: center;
+          align-items: center;
+          padding-left: 10%;
+      }
+      .filter-rating{
+          margin-bottom: 20px;
+      }
+      
+      .filter-rating input {
+          margin-top: 15px;
+          margin-bottom: 0px;
+          width:  350px;
+      }
+      .inner-modal{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      .filter-item{
+          margin-bottom: 10px;
+      }
+      .fa-check {
+          color: green !important;
+      }
+      .fa-times {
+        color: red !important;
+    }
+
 
