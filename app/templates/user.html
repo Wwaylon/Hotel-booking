@@ -109,7 +109,7 @@
             {% for reservation in past_reservations %}
             <div class="reservation">
                 <div class="reservation-info">
-                    <img src="{{ url_for('static', filename= reservation.img1) }}" alt="Img not loaded" class="hotel-image">
+                    <img src="{{ url_for('static', filename='hotel-images/' + reservation.img1) }}" alt="Img not loaded" class="hotel-image">
                     <h2>{{ reservation.hotel_name }}</h2>
                     <h3>{{ reservation.room |title}}, {{ reservation.bed_count |title }} {{ reservation.bed |title}}</h3>
                     <p>{{reservation.hotel_address}}, {{reservation.hotel_city}}, {{reservation.hotel_state}} {{reservation.hotel_postal_code}}, {{reservation.hotel_country}}</p>
