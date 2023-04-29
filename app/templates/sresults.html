@@ -1,3 +1,5 @@
+{% import 'bootstrap/wtf.html' as wtf %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,7 +50,7 @@
     {% endif %}
     {% endwith %}
     <div class ="grid_container"> 
-        <form method="post" action="">
+        <form id="search-form" method="post" action="">
             <div class ="form_grid">
                 <div class="item1"> 
                 <p style="display: inline; font-size: 16; margin-bottom: 0px; margin-top:0px; color: rgb(0, 0, 0);"> <b>Destination</b> </p> 
@@ -75,6 +77,37 @@
             </div>
         </form>
     </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <form id="filter-form" method="post" action="">
+            <span class="close">&times;</span>
+            <div class ="inner-modal"> 
+                <h2>Filter Rating:</h2>
+                <div class="filter-rating">
+                    {{filter_form.min_rating.label}} <br>
+                    {{ filter_form.min_rating(min =0 , max=5, oninput="outputUpdate1(value)") }}
+                    <output for="rating" id="selected-rating1">{{ filter_form.min_rating.data }}</output>
+                    <br>
+                    {{filter_form.max_rating.label}} <br>
+                    {{ filter_form.max_rating(min =0 , max=5, oninput="outputUpdate2(value)") }}
+                    <output for="rating" id="selected-rating2">{{ filter_form.max_rating.data }}</output>
+                </div>
+                <h2>Filter Amenities:</h2>
+                <div class="filter-amentiies">
+                    <div class ="filter-item">{{filter_form.wifi}}{{filter_form.wifi.label}} </div>
+                    <div class ="filter-item">{{filter_form.pool}}{{filter_form.pool.label}} </div>
+                    <div class ="filter-item">{{filter_form.hot_tub}}{{filter_form.hot_tub.label}} </div>
+                    <div class ="filter-item">{{filter_form.gym}}{{filter_form.gym.label}} </div>
+                    <div class ="filter-item">{{filter_form.spa}}{{filter_form.spa.label}} </div>
+                    <div class ="filter-item">{{filter_form.parking}}{{filter_form.parking.label}} </div>
+                    <div class ="filter-item">{{filter_form.elevator}}{{filter_form.elevator.label}} </div>
+                    <div class ="filter-item">{{filter_form.wheelchair}}{{filter_form.wheelchair.label}} </div>
+                </div>
+                <div class ="filter-btn"> {{filter_form.filter(class='button')}}</div>
+            </div>
+            </form>
+        </div>
+    </div>
     <div class="inner-container">
         {% if hotels %}
         <div class="page-title">
@@ -92,6 +125,7 @@
                     <a href=" {{url_for('sresults',  page=current_page, sort='hl')}}">Rating - High to Low</a>
                 </div>
             </div> 
+            <button class="filter_btn" id="myBtn">Filter By</button>
             <ul class="pagination justify-content-center">
                 <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
                     <a class="page-link" href="{{ url_for('sresults', page=current_page-1) }}" aria-label="Previous">
@@ -119,7 +153,7 @@
             {% if hotels %}
                 {% for hotel in hotels %}
                     <div class="hotel_listing">
-                        <img src="{{ url_for('static', filename= hotel[0].img1) }}" alt="Img not loaded" class="hotel-image">
+                        <img src="{{ url_for('static', filename= 'hotel-images/' + hotel[0].img1) }}" alt="Img not loaded" class="hotel-image">
                         <div class="hotel_info">
                             <h5 class="hotel-name">{{ hotel[0].name }}</h5>
                         </div> 
@@ -204,6 +238,32 @@
             //set max date to 3 year from today
             maxDate: new Date().fp_incr(365*2)
         });
+
+        var modal = document.getElementById("myModal");
+
+        var btn = document.getElementById("myBtn");
+
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+        modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+        if (event.target == modal) {
+        modal.style.display = "none";
+        }
+        }
+        function outputUpdate1(rating) {
+        document.querySelector('#selected-rating1').value = rating;
+        }
+        function outputUpdate2(rating) {
+        document.querySelector('#selected-rating2').value = rating;
+        }
     </script>
   
 

@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request, session, a
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm, CancelReservationForm, RedeemPointsForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, HotelSearchForm, ResetPasswordRequestForm, ResetPasswordForm, ReserveRoomForm, CheckInCheckOutForm, CancelReservationForm, RedeemPointsForm, FilterForm
 from app.models import User, Post, Hotel, Room, Reservation
 from app.email import send_password_reset_email
 from sqlalchemy import func, or_
@@ -42,13 +42,20 @@ def load_data():
                 'state': row['state'].strip(),
                 'country': row['country'].strip(),
                 'rating': float(row['rating']),
-                'hdescript': (row['hdescript']).strip(),
                 'img1': row['img1'].strip(),
                 'img2': row['img2'].strip(),
                 'img3': row['img3'].strip(),
                 'website': row['website'].strip(),
                 'phone': row['phone number'].strip(),
-                'email': row['email'].strip()
+                'email': row['email'].strip(),
+                'wifi': bool(int(row['wifi'])),
+                'pool': bool(int(row['pool'])),
+                'hot_tub': bool(int(row['hot_tub'])),
+                'gym': bool(int(row['gym'])),
+                'spa': bool(int(row['spa'])),
+                'parking': bool(int(row['parking'])),  
+                'elevator': bool(int(row['elevator'])),
+                'wheelchair': bool(int(row['wheelchair']))
             }
             hotels.append(hotel)
     with open('app/static/rooms.csv', 'r') as file:
@@ -72,60 +79,6 @@ def load_data():
     db.session.bulk_insert_mappings(Room, rooms)
     db.session.commit()
 
-def load_hotel_csv_to_database():
-    with open('app/static/hotels.csv', 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            # Create a new Hotel object from the row data
-            print(row['id'])
-            hotel = Hotel(id = int(row['id']),
-                          name=row['name'].strip(),
-                          address=row['address'].strip(),
-                          postal_code=int(row['postal_code']),
-                          city=row['city'].strip(),
-                          state=row['state'].strip(),
-                          country=row['country'].strip(),
-                          rating=float(row['rating']),
-                          hdescript=(row['hdescript']).strip(),
-                          img1=row['img1'].strip(),
-                          img2=row['img2'].strip(),
-                          img3=row['img3'].strip(),
-                          website = row['website'].strip(),
-                          phone = row['phone'].strip(),
-                        email = row['email'].strip())
-            # Add the new hotel to the database
-            db.session.add(hotel)
-            # Commit the changes to the database
-            db.session.commit()
-
-def load_room_csv_to_database():
-    with open('app/static/rooms.csv', 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            print(row['id'])
-            # Find the hotel associated with the room
-            hotel = Hotel.query.filter_by(id=int(row['hotel_id'])).first()
-
-            if hotel:
-                # Create a new Room object from the row data
-                room = Room(id=int(row['id']),
-                            pricepn=int(row['pricepn']),
-                            wifi=bool(int(row['wifi'])),
-                            pool=bool(int(row['pool'])),
-                            htub=bool(int(row['htub'])),
-                            petfr=bool(int(row['petfr'])),
-                            ac=bool(int(row['ac'])),
-                            elevator=bool(int(row['elevator'])),
-                            room_type=row['room_type'].strip(),
-                            hotel_id=int(row['hotel_id']))
-                
-                # Add the new room to the database
-                db.session.add(room)
-                # Commit the changes to the database
-                db.session.commit()
-
-
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     #load_data()
@@ -136,6 +89,17 @@ def home():
     if "previous_sort_option" in session:
         session.pop("previous_sort_option", None)
     form = HotelSearchForm()
+    if "wifi" in session and "pool" in session and "hot_tub" in session and "gym" in session and "spa" in session and "parking" in session and "elevator" in session and "wheelchair" in session and "min_rating" in session and "max_rating" in session:
+        session.pop("wifi", None)
+        session.pop("pool", None)
+        session.pop("hot_tub", None)
+        session.pop("gym", None)
+        session.pop("spa", None)
+        session.pop("parking", None)
+        session.pop("elevator", None)
+        session.pop("wheelchair", None)
+        session.pop("min_rating", None)
+        session.pop("max_rating", None)
     if form.validate_on_submit():
         #check if checkout date is after checkin date
         if form.check_out.data < form.check_in.data:
@@ -178,6 +142,25 @@ def index():
 
 @app.route('/sresults', methods=['GET', 'POST'])
 def sresults():
+    filter_flag= request.args.get('filter_options')
+    #if in session
+    if "wifi" in session and "pool" in session and "hot_tub" in session and "gym" in session and "spa" in session and "parking" in session and "elevator" in session and "wheelchair" in session and "min_rating" in session and "max_rating" in session:
+        filter_form = FilterForm(wifi=session["wifi"], pool=session["pool"], hot_tub=session["hot_tub"], gym=session["gym"], spa=session["spa"], parking=session["parking"], elevator=session["elevator"], wheelchair=session["wheelchair"], min_rating=float(session["min_rating"]), max_rating=float(session["max_rating"]))
+    else:
+        filter_form = FilterForm()
+    if filter_form.filter.data:
+        session["wifi"] = filter_form.wifi.data
+        session["pool"] = filter_form.pool.data
+        session["hot_tub"] = filter_form.hot_tub.data
+        session["gym"] = filter_form.gym.data
+        session["spa"] = filter_form.spa.data
+        session["parking"] = filter_form.parking.data
+        session["elevator"] = filter_form.elevator.data
+        session["wheelchair"] = filter_form.wheelchair.data
+        session["min_rating"] = filter_form.min_rating.data
+        session["max_rating"] = filter_form.max_rating.data
+        return redirect(url_for('sresults', filter_options="f"))
+
     if "hotel_id" in session:
         session.pop("hotel_id", None)
     if "location" not in session:
@@ -195,7 +178,7 @@ def sresults():
         city = location.split(',')[0]
     else:
         city = location
-    
+
     hotels_per_page = 9
     page = request.args.get('page', 1, type=int)
     sort_option = request.args.get('sort')
@@ -211,8 +194,28 @@ def sresults():
         else: 
             sort_option = "hl"
     print(sort_option)
-    results = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city)).order_by(Hotel.rating.asc() if sort_option == "lh" else Hotel.rating.desc()).paginate(page=page, per_page=hotels_per_page)
-    #query the lowest cost room for each hotel
+    query = Hotel.query.filter(func.lower(Hotel.city) == func.lower(city))
+    if session.get("wifi"):
+        query = query.filter(Hotel.wifi == True)
+    if session.get("pool"):
+        query = query.filter(Hotel.pool == True)
+    if session.get("hot_tub"):
+        query = query.filter(Hotel.hot_tub == True)
+    if session.get("gym"):
+        query = query.filter(Hotel.gym == True)
+    if session.get("spa"):
+        query = query.filter(Hotel.spa == True)
+    if session.get("parking"):
+        query = query.filter(Hotel.parking == True)
+    if session.get("elevator"):
+        query = query.filter(Hotel.elevator == True)
+    if session.get("wheelchair"):
+        query = query.filter(Hotel.wheelchair == True)
+    if session.get("min_rating"):
+        query = query.filter(Hotel.rating >= session["min_rating"])
+    if session.get("max_rating"):
+        query = query.filter(Hotel.rating <= session["max_rating"])
+    results = query.order_by(Hotel.rating.asc() if sort_option == "lh" else Hotel.rating.desc()).paginate(page=page, per_page=hotels_per_page)
     hotel_list = []
     for hotel in results.items:
         hotel_list.append((hotel, Room.query.filter_by(hotel_id=hotel.id).order_by(Room.pricepn).first()))
@@ -222,7 +225,18 @@ def sresults():
 
     num_pages = results.pages
 
-    if form.validate_on_submit():
+    if form.submit.data and form.validate():
+        if "wifi" in session and "pool" in session and "hot_tub" in session and "gym" in session and "spa" in session and "parking" in session and "elevator" in session and "wheelchair" in session and "min_rating" in session and "max_rating" in session:
+            session.pop("wifi", None)
+            session.pop("pool", None)
+            session.pop("hot_tub", None)
+            session.pop("gym", None)
+            session.pop("spa", None)
+            session.pop("parking", None)
+            session.pop("elevator", None)
+            session.pop("wheelchair", None)
+            session.pop("min_rating", None)
+            session.pop("max_rating", None)
         if form.check_out.data < form.check_in.data:
             flash('Check-out date must be after check-in date')
             return redirect(url_for('sresults'))
@@ -231,18 +245,27 @@ def sresults():
         session["check_out"] = form.check_out.data.strftime('%Y-%m-%d')
         return redirect(url_for('sresults', page=1))
     
-    if request.method == "GET":
-        #read cities.csv into cities without quotes
-        with open('app/static/cities.csv', 'r') as f:
-            reader = csv.reader(f)
-            cities = list(reader)
-            #remove ' from each entry
-            cities = [x[0].replace("'", "") for x in cities]
-        return render_template('sresults.html', city=city, hotels=hotel_list, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option, cities=cities)
+    with open('app/static/cities.csv', 'r') as f:
+        reader = csv.reader(f)
+        cities = list(reader)
+        #remove ' from each entry
+        cities = [x[0].replace("'", "") for x in cities]
+    return render_template('sresults.html', city=city, hotels=hotel_list, form=form, pagination=results, current_page=page, num_pages=num_pages,  sort_option=sort_option, cities=cities, filter_form=filter_form)
 
 
 @app.route('/hotel/<hotel_id>', methods=['GET', 'POST'])
 def hotel(hotel_id):
+    if "wifi" in session and "pool" in session and "hot_tub" in session and "gym" in session and "spa" in session and "parking" in session and "elevator" in session and "wheelchair" in session and "min_rating" in session and "max_rating" in session:
+        session.pop("wifi", None)
+        session.pop("pool", None)
+        session.pop("hot_tub", None)
+        session.pop("gym", None)
+        session.pop("spa", None)
+        session.pop("parking", None)
+        session.pop("elevator", None)
+        session.pop("wheelchair", None)
+        session.pop("min_rating", None)
+        session.pop("max_rating", None)
     if "check_in" not in session or "check_out" not in session:
         flash('Please enter a check-in and check-out date. Before preceding to the hotel page.')
         return redirect(url_for('sresults'))

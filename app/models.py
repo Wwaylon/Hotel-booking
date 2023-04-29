@@ -113,6 +113,15 @@ class Hotel(db.Model):
     img2 = db.Column(db.String)
     img3 = db.Column(db.String)
 
+    wifi = db.Column(db.Boolean)
+    pool = db.Column(db.Boolean)
+    hot_tub = db.Column(db.Boolean)
+    gym = db.Column(db.Boolean)
+    spa = db.Column(db.Boolean)
+    parking = db.Column(db.Boolean)
+    elevator = db.Column(db.Boolean)
+    wheelchair = db.Column(db.Boolean)
+
     def __repr__(self):
         return '<Hotel {}>'.format(self.name)
 

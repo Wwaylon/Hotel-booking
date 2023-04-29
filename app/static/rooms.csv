@@ -2,7 +2,7 @@
 1,186,1,0,0,1,room,1,double bed,291,1,1
 2,186,1,0,1,1,room,1,double bed,291,2,1
 3,186,1,0,1,1,room,1,double bed,291,3,1
-4,186,1,0,1,1,room,1,double bed,291,4,1
+4,142,1,0,1,1,room,1,double bed,291,4,1
 5,186,1,0,0,1,room,1,double bed,291,5,1
 6,186,1,0,1,1,room,1,double bed,291,6,1
 7,186,1,0,1,1,room,1,double bed,291,7,1
@@ -25,7 +25,7 @@
 24,443,1,1,1,1,Suite,1,double bed,600,24,1
 25,443,1,1,1,1,Suite,1,king bed,600,25,1
 26,443,1,0,1,1,Suite,1,king bed,600,26,1
-27,186,1,0,0,1,room,1,double bed,291,27,2
+27,155,1,0,0,1,room,1,double bed,291,27,2
 28,186,1,0,1,1,room,1,double bed,291,28,2
 29,186,1,0,1,1,room,1,double bed,291,29,2
 30,186,1,0,1,1,room,1,double bed,291,30,2
@@ -51,8 +51,8 @@
 50,443,1,1,1,1,Suite,1,double bed,600,50,2
 51,443,1,1,1,1,Suite,1,king bed,600,51,2
 52,443,1,0,1,1,Suite,1,king bed,600,52,2
-53,186,1,0,0,1,room,1,double bed,291,53,3
-54,186,1,0,1,1,room,1,double bed,291,54,3
+53,181,1,0,0,1,room,1,double bed,291,53,3
+54,192,1,0,1,1,room,1,double bed,291,54,3
 55,186,1,0,1,1,room,1,double bed,291,55,3
 56,186,1,0,1,1,room,1,double bed,291,56,3
 57,186,1,0,0,1,room,1,double bed,291,57,3
@@ -78,7 +78,7 @@
 77,443,1,1,1,1,Suite,1,king bed,600,77,3
 78,443,1,0,1,1,Suite,1,king bed,600,78,3
 79,186,1,0,0,1,room,1,double bed,291,79,4
-80,186,1,0,1,1,room,1,double bed,291,80,4
+80,175,1,0,1,1,room,1,double bed,291,80,4
 81,186,1,0,1,1,room,1,double bed,291,81,4
 82,186,1,0,1,1,room,1,double bed,291,82,4
 83,186,1,0,0,1,room,1,double bed,291,83,4
@@ -158,7 +158,7 @@
 157,186,1,0,0,1,room,1,double bed,291,157,7
 158,186,1,0,1,1,room,1,double bed,291,158,7
 159,186,1,0,1,1,room,1,double bed,291,159,7
-160,186,1,0,1,1,room,1,double bed,291,160,7
+160,152,1,0,1,1,room,1,double bed,291,160,7
 161,186,1,0,0,1,room,1,double bed,291,161,7
 162,186,1,0,1,1,room,1,double bed,291,162,7
 163,186,1,0,1,1,room,1,double bed,291,163,7
@@ -264,7 +264,7 @@
 ,186,1,0,1,1,room,1,double bed,291,263,11
 ,186,1,0,1,1,room,1,double bed,291,264,11
 ,186,1,0,0,1,room,1,double bed,291,265,11
-,186,1,0,1,1,room,1,double bed,291,266,11
+,120,1,0,1,1,room,1,double bed,291,266,11
 ,186,1,0,1,1,room,1,double bed,291,267,11
 ,186,1,0,1,1,room,1,double bed,291,268,11
 ,186,1,0,0,1,room,1,double bed,291,269,11
@@ -339,7 +339,7 @@
 ,443,1,0,1,1,Suite,1,king bed,600,338,13
 ,186,1,0,0,1,room,1,double bed,291,339,14
 ,186,1,0,1,1,room,1,double bed,291,340,14
-,186,1,0,1,1,room,1,double bed,291,341,14
+,110,1,0,1,1,room,1,double bed,291,341,14
 ,186,1,0,1,1,room,1,double bed,291,342,14
 ,186,1,0,0,1,room,1,double bed,291,343,14
 ,186,1,0,1,1,room,1,double bed,291,344,14
@@ -364,7 +364,7 @@
 ,443,1,1,1,1,Suite,1,king bed,600,363,14
 ,443,1,0,1,1,Suite,1,king bed,600,364,14
 ,186,1,0,0,1,room,1,double bed,291,365,15
-,186,1,0,1,1,room,1,double bed,291,366,15
+,120,1,0,1,1,room,1,double bed,291,366,15
 ,186,1,0,1,1,room,1,double bed,291,367,15
 ,186,1,0,1,1,room,1,double bed,291,368,15
 ,186,1,0,0,1,room,1,double bed,291,369,15
@@ -391,7 +391,7 @@
 ,443,1,0,1,1,Suite,1,king bed,600,390,15
 ,186,1,0,0,1,room,1,double bed,291,391,16
 ,186,1,0,1,1,room,1,double bed,291,392,16
-,186,1,0,1,1,room,1,double bed,291,393,16
+,132,1,0,1,1,room,1,double bed,291,393,16
 ,186,1,0,1,1,room,1,double bed,291,394,16
 ,186,1,0,0,1,room,1,double bed,291,395,16
 ,186,1,0,1,1,room,1,double bed,291,396,16
@@ -415,7 +415,7 @@
 ,443,1,1,1,1,Suite,1,double bed,600,414,16
 ,443,1,1,1,1,Suite,1,king bed,600,415,16
 ,443,1,0,1,1,Suite,1,king bed,600,416,16
-,186,1,0,0,1,room,1,double bed,291,417,17
+,132,1,0,0,1,room,1,double bed,291,417,17
 ,186,1,0,1,1,room,1,double bed,291,418,17
 ,186,1,0,1,1,room,1,double bed,291,419,17
 ,186,1,0,1,1,room,1,double bed,291,420,17
@@ -441,8 +441,8 @@
 ,443,1,1,1,1,Suite,1,double bed,600,440,17
 ,443,1,1,1,1,Suite,1,king bed,600,441,17
 ,443,1,0,1,1,Suite,1,king bed,600,442,17
-,186,1,0,0,1,room,1,double bed,291,443,18
-,186,1,0,1,1,room,1,double bed,291,444,18
+,135,1,0,0,1,room,1,double bed,291,443,18
+,135,1,0,1,1,room,1,double bed,291,444,18
 ,186,1,0,1,1,room,1,double bed,291,445,18
 ,186,1,0,1,1,room,1,double bed,291,446,18
 ,186,1,0,0,1,room,1,double bed,291,447,18
@@ -493,9 +493,9 @@
 ,443,1,1,1,1,Suite,1,double bed,600,492,19
 ,443,1,1,1,1,Suite,1,king bed,600,493,19
 ,443,1,0,1,1,Suite,1,king bed,600,494,19
-,186,1,0,0,1,room,1,double bed,291,495,20
-,186,1,0,1,1,room,1,double bed,291,496,20
-,186,1,0,1,1,room,1,double bed,291,497,20
+,101,1,0,0,1,room,1,double bed,291,495,20
+,101,1,0,1,1,room,1,double bed,291,496,20
+,101,1,0,1,1,room,1,double bed,291,497,20
 ,186,1,0,1,1,room,1,double bed,291,498,20
 ,186,1,0,0,1,room,1,double bed,291,499,20
 ,186,1,0,1,1,room,1,double bed,291,500,20
@@ -545,3 +545,133 @@
 ,443,1,1,1,1,Suite,1,double bed,600,544,21
 ,443,1,1,1,1,Suite,1,king bed,600,545,21
 ,443,1,0,1,1,Suite,1,king bed,600,546,21
+,132,1,0,0,1,room,1,double bed,291,547,22
+,132,1,0,1,1,room,1,double bed,291,548,22
+,132,1,0,1,1,room,1,double bed,291,549,22
+,186,1,0,1,1,room,1,double bed,291,550,22
+,186,1,0,0,1,room,1,double bed,291,551,22
+,186,1,0,1,1,room,1,double bed,291,552,22
+,186,1,0,1,1,room,1,double bed,291,553,22
+,186,1,0,1,1,room,1,double bed,291,554,22
+,186,1,0,0,1,room,1,double bed,291,555,22
+,223,1,0,1,1,room,2,double bed,291,556,22
+,223,1,0,1,1,room,2,double bed,291,557,22
+,223,1,0,1,1,room,2,double bed,291,558,22
+,223,1,0,0,1,room,2,double bed,291,559,22
+,223,1,0,1,1,room,2,double bed,291,560,22
+,250,1,0,1,1,room,1,king bed,291,561,22
+,250,1,0,1,1,room,1,king bed,291,562,22
+,250,1,0,1,1,room,1,king bed,291,563,22
+,332,1,0,1,1,Deluxe Room,2,double bed,441,564,22
+,332,1,0,1,1,Deluxe Room,2,double bed,441,565,22
+,332,1,1,1,1,Deluxe Room,1,double bed,441,566,22
+,332,1,0,1,1,Deluxe Room,1,king bed,441,567,22
+,443,1,0,1,1,Suite,2,double bed,600,568,22
+,443,1,0,1,1,Suite,2,double bed,600,569,22
+,443,1,1,1,1,Suite,1,double bed,600,570,22
+,443,1,1,1,1,Suite,1,king bed,600,571,22
+,443,1,0,1,1,Suite,1,king bed,600,572,22
+,186,1,0,0,1,room,1,double bed,291,573,23
+,132,1,0,1,1,room,1,double bed,291,574,23
+,132,1,0,1,1,room,1,double bed,291,575,23
+,132,1,0,1,1,room,1,double bed,291,576,23
+,186,1,0,0,1,room,1,double bed,291,577,23
+,186,1,0,1,1,room,1,double bed,291,578,23
+,186,1,0,1,1,room,1,double bed,291,579,23
+,186,1,0,1,1,room,1,double bed,291,580,23
+,186,1,0,0,1,room,1,double bed,291,581,23
+,223,1,0,1,1,room,2,double bed,291,582,23
+,223,1,0,1,1,room,2,double bed,291,583,23
+,223,1,0,1,1,room,2,double bed,291,584,23
+,223,1,0,0,1,room,2,double bed,291,585,23
+,223,1,0,1,1,room,2,double bed,291,586,23
+,250,1,0,1,1,room,1,king bed,291,587,23
+,250,1,0,1,1,room,1,king bed,291,588,23
+,250,1,0,1,1,room,1,king bed,291,589,23
+,332,1,0,1,1,Deluxe Room,2,double bed,441,590,23
+,332,1,0,1,1,Deluxe Room,2,double bed,441,591,23
+,332,1,1,1,1,Deluxe Room,1,double bed,441,592,23
+,332,1,0,1,1,Deluxe Room,1,king bed,441,593,23
+,443,1,0,1,1,Suite,2,double bed,600,594,23
+,443,1,0,1,1,Suite,2,double bed,600,595,23
+,443,1,1,1,1,Suite,1,double bed,600,596,23
+,443,1,1,1,1,Suite,1,king bed,600,597,23
+,443,1,0,1,1,Suite,1,king bed,600,598,23
+,186,1,0,0,1,room,1,double bed,291,599,24
+,186,1,0,1,1,room,1,double bed,291,600,24
+,186,1,0,1,1,room,1,double bed,291,601,24
+,186,1,0,1,1,room,1,double bed,291,602,24
+,186,1,0,0,1,room,1,double bed,291,603,24
+,156,1,0,1,1,room,1,double bed,291,604,24
+,186,1,0,1,1,room,1,double bed,291,605,24
+,186,1,0,1,1,room,1,double bed,291,606,24
+,186,1,0,0,1,room,1,double bed,291,607,24
+,223,1,0,1,1,room,2,double bed,291,608,24
+,223,1,0,1,1,room,2,double bed,291,609,24
+,223,1,0,1,1,room,2,double bed,291,610,24
+,223,1,0,0,1,room,2,double bed,291,611,24
+,223,1,0,1,1,room,2,double bed,291,612,24
+,250,1,0,1,1,room,1,king bed,291,613,24
+,250,1,0,1,1,room,1,king bed,291,614,24
+,250,1,0,1,1,room,1,king bed,291,615,24
+,332,1,0,1,1,Deluxe Room,2,double bed,441,616,24
+,332,1,0,1,1,Deluxe Room,2,double bed,441,617,24
+,332,1,1,1,1,Deluxe Room,1,double bed,441,618,24
+,332,1,0,1,1,Deluxe Room,1,king bed,441,619,24
+,443,1,0,1,1,Suite,2,double bed,600,620,24
+,443,1,0,1,1,Suite,2,double bed,600,621,24
+,443,1,1,1,1,Suite,1,double bed,600,622,24
+,443,1,1,1,1,Suite,1,king bed,600,623,24
+,443,1,0,1,1,Suite,1,king bed,600,624,24
+,186,1,0,0,1,room,1,double bed,291,625,25
+,186,1,0,1,1,room,1,double bed,291,626,25
+,186,1,0,1,1,room,1,double bed,291,627,25
+,186,1,0,1,1,room,1,double bed,291,628,25
+,186,1,0,0,1,room,1,double bed,291,629,25
+,186,1,0,1,1,room,1,double bed,291,630,25
+,186,1,0,1,1,room,1,double bed,291,631,25
+,186,1,0,1,1,room,1,double bed,291,632,25
+,186,1,0,0,1,room,1,double bed,291,633,25
+,223,1,0,1,1,room,2,double bed,291,634,25
+,223,1,0,1,1,room,2,double bed,291,635,25
+,223,1,0,1,1,room,2,double bed,291,636,25
+,223,1,0,0,1,room,2,double bed,291,637,25
+,223,1,0,1,1,room,2,double bed,291,638,25
+,250,1,0,1,1,room,1,king bed,291,639,25
+,250,1,0,1,1,room,1,king bed,291,640,25
+,250,1,0,1,1,room,1,king bed,291,641,25
+,332,1,0,1,1,Deluxe Room,2,double bed,441,642,25
+,332,1,0,1,1,Deluxe Room,2,double bed,441,643,25
+,332,1,1,1,1,Deluxe Room,1,double bed,441,644,25
+,332,1,0,1,1,Deluxe Room,1,king bed,441,645,25
+,443,1,0,1,1,Suite,2,double bed,600,646,25
+,443,1,0,1,1,Suite,2,double bed,600,647,25
+,443,1,1,1,1,Suite,1,double bed,600,648,25
+,443,1,1,1,1,Suite,1,king bed,600,649,25
+,443,1,0,1,1,Suite,1,king bed,600,650,25
+,100,1,0,0,1,room,1,double bed,291,651,26
+,186,1,0,1,1,room,1,double bed,291,652,26
+,186,1,0,1,1,room,1,double bed,291,653,26
+,186,1,0,1,1,room,1,double bed,291,654,26
+,186,1,0,0,1,room,1,double bed,291,655,26
+,186,1,0,1,1,room,1,double bed,291,656,26
+,186,1,0,1,1,room,1,double bed,291,657,26
+,186,1,0,1,1,room,1,double bed,291,658,26
+,186,1,0,0,1,room,1,double bed,291,659,26
+,223,1,0,1,1,room,2,double bed,291,660,26
+,223,1,0,1,1,room,2,double bed,291,661,26
+,223,1,0,1,1,room,2,double bed,291,662,26
+,223,1,0,0,1,room,2,double bed,291,663,26
+,223,1,0,1,1,room,2,double bed,291,664,26
+,250,1,0,1,1,room,1,king bed,291,665,26
+,250,1,0,1,1,room,1,king bed,291,666,26
+,250,1,0,1,1,room,1,king bed,291,667,26
+,332,1,0,1,1,Deluxe Room,2,double bed,441,668,26
+,332,1,0,1,1,Deluxe Room,2,double bed,441,669,26
+,332,1,1,1,1,Deluxe Room,1,double bed,441,670,26
+,332,1,0,1,1,Deluxe Room,1,king bed,441,671,26
+,443,1,0,1,1,Suite,2,double bed,600,672,26
+,443,1,0,1,1,Suite,2,double bed,600,673,26
+,443,1,1,1,1,Suite,1,double bed,600,674,26
+,443,1,1,1,1,Suite,1,king bed,600,675,26
+,443,1,0,1,1,Suite,1,king bed,600,676,26

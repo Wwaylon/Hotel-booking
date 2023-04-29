@@ -5,6 +5,10 @@
   .checked {
   color: orange;
   }
+  .datepickerf
+  {
+    width:95% !important;
+  }
   .google-maps {
   display: inline-block;
   vertical-align: top;
@@ -221,3 +225,6 @@
       background-color: #000;
       color: #fff;
     }
+
+
+

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, IntegerField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, IntegerField, SelectField, RadioField, FloatField, DecimalRangeField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional, NumberRange
 from app.models import User
 
@@ -91,3 +91,16 @@ class CancelReservationForm(FlaskForm):
 class RedeemPointsForm(FlaskForm):
     redeem = BooleanField('Redeem 100 points for a free night stay', validators=[DataRequired(message='You must check this box to confirm redemption.')])
     submit = SubmitField('Redeem Points')
+
+class FilterForm(FlaskForm):
+    wifi = BooleanField('Wifi', validators=[Optional()])
+    pool = BooleanField('Pool', validators=[Optional()])
+    hot_tub = BooleanField('Hot Tub', validators=[Optional()])
+    gym = BooleanField('Gym', validators=[Optional()])
+    spa = BooleanField('Spa', validators=[Optional()])
+    parking = BooleanField('Parking', validators=[Optional()])
+    elevator = BooleanField('Elevator', validators=[Optional()]) 
+    wheelchair = BooleanField('Wheelchair-accessible parking', validators=[Optional()])
+    min_rating = DecimalRangeField('Minimum Rating', validators=[Optional()], default=0, places=1, render_kw=dict(step=0.1))
+    max_rating = DecimalRangeField('Maximum Rating', validators=[Optional()], default=5, places=1, render_kw=dict(step=0.1))
+    filter = SubmitField('Filter')
