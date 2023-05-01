@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+</head>
+
+<body>
+    <header>
+        <div class="navigation">
+            <a href="{{url_for('home')}}" id="website-name">Like<span style="color: rgb(255, 255, 0)">Home</span>
+                <svg class="website-logo" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></a>
+            <nav>
+                <ul>
+                <li><a href="{{url_for('home')}}">Home</a></li>
+                <li><a href="#">About</a></li>
+                {% if current_user.is_anonymous %}
+                  <li><a href="{{url_for('login')}}">Login</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                  <li><a href="{{url_for('logout')}}">Logout</a></li>
+                {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header> 
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="flash" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="inner-container">
+        <h1 style="text-align: center;">About Us</h1>
+        <h2>Welcome to Our Hotel Booking Website</h2>
+        <p>
+            We are a premier hotel booking service, providing our customers with access to the best accommodations around the world. Our mission is to make your travel experience seamless and hassle-free.
+        </p>
+        <h2>Our Story</h2>
+        <p>
+            Founded in 2023, we are a team of students working to provide a visually cleaner and easier to use hotel booking solution.
+        </p>
+        <h2>Policies</h2>
+        <h3>-Reward Points</h3>
+        <li> Users earn reward points on reservations at a rate of 5 points per night on a reservation</li>
+        <li> A User can earn a maximum of 100 points</li>
+        <li> At a 100 points, users are able to redeem their points for a free night on their next reservation</li>
+        <h3>-Cancellations are refunds</h3>
+        <li> Cancellations are allowed up before the check in date of a reservation</li>
+        <li> Cancellations made after the check in date will not be refunded</li>
+        <li> While a user will be refunded for their cancellation, a 50$ cancellation fee will be applied</li>
+    </div>
+    <div class="section-divider"></div>
+    <footer>
+        <p>&copy; 2023 LikeHome. All rights reserved.</p>
+    </footer>
+  </div> <!-- End of .container -->
+</body>
+
+</html>

@@ -370,8 +370,9 @@ def reserve(room_id):
     hotel = Hotel.query.filter_by(id=room.hotel_id).first()
     for reservation in reservations:
         #check if there is overlap
-        if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
-            flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
+        res_hotel_id  = Room.query.filter_by(id=reservation.room_id).first().hotel_id
+        if(reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out) and not res_hotel_id == hotel.id:
+            flash('Your current reservation overlaps with a parts or all of another previous reservation at a different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
             return redirect(url_for('hotel', hotel_id=hotel.id))
 
 
@@ -974,3 +975,7 @@ def new_event():
         db.session.add(reservation)
         db.session.commit()
     return {'success': True}
+
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+    return render_template('about.html')
