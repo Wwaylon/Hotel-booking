@@ -473,7 +473,7 @@ def edit_reservation_reserve(room_id, reservation_id):
             reservations.remove(reservation)
             continue
         if reservation.check_in <= check_in_dt < reservation.check_out or reservation.check_in < check_out_dt <= reservation.check_out:
-            flash('Your current reservation overlaps with a parts or all of another previous reservation at the current or different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
+            flash('Your current reservation overlaps with parts or all of another previous reservation at a different hotel. Double booking is not allowed, please select a different check-in and check-out date.')
             return redirect(url_for('edit_reservation', reservation_id=reservation_id))
 
 
