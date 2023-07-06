@@ -42,7 +42,7 @@
         <section id="home">
             <div class="container-1">
               {% with messages = get_flashed_messages() %}
-              <div class="flash" role="alert">Note that the website has no active data. Please only search San Francisco, CA to be able to test functionality</div>
+              <div class="flash" role="alert">Note that the website has no active data. Please only search "San Francisco" to be able to test functionality</div>
               {% if messages %}
                   {% for message in messages %}
                   <div class="flash" role="alert">{{ message }}</div>
