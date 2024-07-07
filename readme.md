@@ -1,4 +1,4 @@
-#Hotel Booking Website
+# Hotel Booking Website
 
 Steps to build and run
 
